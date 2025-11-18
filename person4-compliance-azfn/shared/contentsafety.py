@@ -16,19 +16,19 @@ client = None
 if endpoint and key:
     try:
         client = ContentSafetyClient(endpoint, AzureKeyCredential(key))
+        logger.info("Azure Content Safety client initialized")
     except Exception as e:
         logger.error("Failed to initialize Azure Content Safety client: %s", e)
 else:
-    logger.warning("Azure Content Safety KEY or ENDPOINT missing — running mock mode.")
+    logger.warning("Azure Content Safety KEY or ENDPOINT missing - running mock mode.")
 
 def analyze_message(text: str):
     """
-    If Azure key exists → use Azure Content Safety.
-    Otherwise → fallback to mock.
+    Analyze text using Azure Content Safety.
+    Fallback to mock if client not initialized.
     """
     global client
 
-    # Mock fallback
     if client is None:
         return {
             "approved": True,
@@ -41,18 +41,20 @@ def analyze_message(text: str):
         request = AnalyzeTextOptions(text=text)
         result = client.analyze_text(request)
 
-        categories = {
-            "hate": result.hate.result,
-            "sexual": result.sexual.result,
-            "violence": result.violence.result,
-            "self_harm": result.self_harm.result
+        # ✅ Compatible with SDK terbaru
+        categories = getattr(result, "categories", {})
+        category_scores = {
+            "hate": categories.get("hate", 0),
+            "sexual": categories.get("sexual", 0),
+            "violence": categories.get("violence", 0),
+            "self_harm": categories.get("self_harm", 0)
         }
 
-        approved = all(value == 0 for value in categories.values())
+        approved = all(value < 2 for value in category_scores.values())
 
         return {
             "approved": approved,
-            "categories": categories,
+            "categories": category_scores,
             "reason": "Azure Content Safety",
             "confidence": 1.0
         }
@@ -61,7 +63,7 @@ def analyze_message(text: str):
         logger.error("Azure Content Safety error: %s", e)
         return {
             "approved": False,
-            "categories": {"hate": 1, "sexual": 0, "violence": 0, "self_harm": 0},
-            "reason": "Azure Content Safety Error",
+            "categories": {},
+            "reason": f"Azure error: {str(e)}",
             "confidence": 0.0
         }
