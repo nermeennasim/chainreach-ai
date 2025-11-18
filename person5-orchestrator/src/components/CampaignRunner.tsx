@@ -41,6 +41,8 @@ export function CampaignRunner({ onCampaignComplete }: CampaignRunnerProps) {
     try {
       const customers = generateMockCustomers(customerCount);
       
+      console.log('Sending request:', { customers, format });
+      
       const response = await fetch('/api/campaign', {
         method: 'POST',
         headers: {
@@ -53,14 +55,20 @@ export function CampaignRunner({ onCampaignComplete }: CampaignRunnerProps) {
       });
 
       const data = await response.json();
+      console.log('Response:', response.status, data);
+      
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP ${response.status}`);
+      }
       
       if (data.success) {
         onCampaignComplete(data);
       } else {
-        console.error('Campaign failed:', data.error);
+        throw new Error(data.error || 'Campaign failed');
       }
     } catch (error) {
       console.error('Error running campaign:', error);
+      alert(`Campaign failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
