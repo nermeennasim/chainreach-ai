@@ -297,7 +297,7 @@ const cosmosDBTrigger: AzureFunction = async function (
     }
   }
 
-  analytics.metrics.averageConfidence = totalConfidence / documents.length;
+  analytics.metrics.averageConfidence = documents.length > 0 ? totalConfidence / documents.length : 0;
 
   // Generate alerts
   const successRate = 
