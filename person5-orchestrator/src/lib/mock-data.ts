@@ -62,6 +62,9 @@ export interface AgentStatus {
     totalCalls: number;
     successRate: number; // percentage
     lastChecked: Date;
+    activeTimeHours?: number; // hours agent has been active
+    messagesProcessed?: number; // total messages/requests handled
+    avgCallsPerMinute?: number; // average API calls per minute
   };
   recentErrors: Array<{
     timestamp: Date;
@@ -196,10 +199,12 @@ export function generatePipelineStatus(): PipelineStatus {
 }
 
 export function generateAgentStatuses(): AgentStatus[] {
+  const activeTimeHours = 23.5; // 23.5 hours active out of 24
+  
   return [
     {
       agentId: 1,
-      name: 'Segmentation',
+      name: 'Segmentation (ML)',
       status: 'healthy',
       health: {
         responseTime: 245,
@@ -207,12 +212,15 @@ export function generateAgentStatuses(): AgentStatus[] {
         totalCalls: 1247,
         successRate: 99.8,
         lastChecked: new Date(),
+        activeTimeHours: activeTimeHours,
+        messagesProcessed: 5247,
+        avgCallsPerMinute: 52,
       },
       recentErrors: [],
     },
     {
       agentId: 2,
-      name: 'Content Retrieval',
+      name: 'Content (PostgreSQL)',
       status: 'healthy',
       health: {
         responseTime: 180,
@@ -220,6 +228,9 @@ export function generateAgentStatuses(): AgentStatus[] {
         totalCalls: 1247,
         successRate: 100,
         lastChecked: new Date(),
+        activeTimeHours: 24,
+        messagesProcessed: 5247,
+        avgCallsPerMinute: 51,
       },
       recentErrors: [],
     },
@@ -233,12 +244,15 @@ export function generateAgentStatuses(): AgentStatus[] {
         totalCalls: 1247,
         successRate: 100,
         lastChecked: new Date(),
+        activeTimeHours: 24,
+        messagesProcessed: 5247,
+        avgCallsPerMinute: 51,
       },
       recentErrors: [],
     },
     {
       agentId: 4,
-      name: 'Compliance Check',
+      name: 'Content Safety',
       status: 'healthy',
       health: {
         responseTime: 320,
@@ -246,6 +260,9 @@ export function generateAgentStatuses(): AgentStatus[] {
         totalCalls: 1247,
         successRate: 97.2,
         lastChecked: new Date(),
+        activeTimeHours: 23.8,
+        messagesProcessed: 5102,
+        avgCallsPerMinute: 51,
       },
       recentErrors: [],
     },
