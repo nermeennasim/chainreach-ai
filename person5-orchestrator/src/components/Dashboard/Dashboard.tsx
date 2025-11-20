@@ -20,7 +20,7 @@ export function Dashboard({ summary }: DashboardProps) {
   if (!summary) {
     return (
       <Card>
-        <CardHeader>
+        <CardHeader className='bg-purple-500'>
           <CardTitle>Campaign Dashboard</CardTitle>
           <CardDescription>
             Run a campaign to see results here
