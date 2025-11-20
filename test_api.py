@@ -166,11 +166,11 @@ def run_all_tests():
         test_list_content()
         
         print("\n" + "="*60)
-        print("  ✅ ALL TESTS COMPLETED")
+        print("   ALL TESTS COMPLETED")
         print("="*60 + "\n")
         
     except requests.exceptions.ConnectionError:
-        print("\n❌ ERROR: Cannot connect to API server")
+        print("\n ERROR: Cannot connect to API server")
         print("Please make sure the API is running:")
         print("  python api.py")
         print()

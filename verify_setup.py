@@ -12,15 +12,15 @@ def check_item(name: str, check_func, fix_suggestion: str = ""):
     try:
         result = check_func()
         if result:
-            print(f"✅ {name}")
+            print(f" {name}")
             return True
         else:
-            print(f"❌ {name}")
+            print(f" {name}")
             if fix_suggestion:
                 print(f"   Fix: {fix_suggestion}")
             return False
     except Exception as e:
-        print(f"❌ {name}")
+        print(f" {name}")
         print(f"   Error: {e}")
         if fix_suggestion:
             print(f"   Fix: {fix_suggestion}")
@@ -143,7 +143,7 @@ def main():
     ))
     
     # Core dependencies
-    print("\n📦 Checking Python Dependencies:")
+    print("\n Checking Python Dependencies:")
     checks.append(check_item(
         "FastAPI installed",
         lambda: check_module("fastapi"),
@@ -166,7 +166,7 @@ def main():
     ))
     
     # Docker
-    print("\n🐳 Checking Docker:")
+    print("\n Checking Docker:")
     checks.append(check_item(
         "Docker installed",
         check_docker,
@@ -179,7 +179,7 @@ def main():
     ))
     
     # Configuration
-    print("\n⚙️  Checking Configuration:")
+    print("\n  Checking Configuration:")
     checks.append(check_item(
         ".env file exists",
         check_env_file,
@@ -187,7 +187,7 @@ def main():
     ))
     
     # Database
-    print("\n🐘 Checking Database:")
+    print("\n Checking Database:")
     checks.append(check_item(
         "PostgreSQL container running",
         check_postgres_running,
@@ -207,7 +207,7 @@ def main():
         ))
     
     # Embedding model
-    print("\n🤖 Checking AI Model:")
+    print("\n Checking AI Model:")
     checks.append(check_item(
         "Embedding model loads",
         check_embedding_model,
@@ -220,17 +220,17 @@ def main():
     total = len(checks)
     
     if passed == total:
-        print(f"✅ ALL CHECKS PASSED ({passed}/{total})")
+        print(f" ALL CHECKS PASSED ({passed}/{total})")
         print("="*60)
-        print("\n🚀 Ready to start the API!")
+        print("\n Ready to start the API!")
         print("\nNext steps:")
         print("  1. python api.py")
         print("  2. Visit http://localhost:8000/docs")
         print("  3. python test_api.py")
     else:
-        print(f"⚠️  SOME CHECKS FAILED ({passed}/{total} passed)")
+        print(f" SOME CHECKS FAILED ({passed}/{total} passed)")
         print("="*60)
-        print("\n📝 Follow the 'Fix' suggestions above")
+        print("\n Follow the 'Fix' suggestions above")
         print("\nCommon fixes:")
         print("  • Install dependencies: pip install -r requirements.txt")
         print("  • Start database: docker-compose up -d")

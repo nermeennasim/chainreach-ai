@@ -381,14 +381,14 @@ cache = redis.Redis(host='localhost', port=6379)
 - [ ] Configure logging
 - [ ] Add error alerting
 
-## 🎓 Next Steps
+##  Next Steps
 
-1. ✅ **Complete Quickstart** - Get it running locally
-2. 📊 **Review sample data** - Understand the schema
-3. 🔍 **Try searches** - Test different queries
-4. 💻 **Run examples** - See integration patterns
-5. 🔧 **Customize** - Add your own content
-6. 🚀 **Deploy** - Move to production
+1.  **Complete Quickstart** - Get it running locally
+2.  **Review sample data** - Understand the schema
+3.  **Try searches** - Test different queries
+4.  **Run examples** - See integration patterns
+5.  **Customize** - Add your own content
+6.  **Deploy** - Move to production
 
 ---
 
