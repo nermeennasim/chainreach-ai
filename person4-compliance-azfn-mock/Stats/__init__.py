@@ -11,7 +11,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     response = {
         "total_requests": request_count,
         "service": "compliance-checker",
-        "mode": "AZURE",
+        "mode": "LOCAL-MOCK",
         "uptime": "running"
     }
 

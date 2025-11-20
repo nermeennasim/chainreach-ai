@@ -18,7 +18,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         "service": "compliance-checker",
         "person": "Person 4",
         "version": "1.0.0-local",
-        "mode": "AZURE",
+        "mode": "LOCAL-MOCK",
         "requests_processed": request_count,
         "timestamp": datetime.utcnow().isoformat()
     }
