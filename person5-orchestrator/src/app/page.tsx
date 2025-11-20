@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function Home() {
   const router = useRouter()
@@ -34,8 +35,15 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-lg border-b border-white/20">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold text-white flex items-center gap-2">
-              ChainReach AI
+            <div className="flex items-center gap-3">
+              <Image 
+                src="/logo_wo_bg.png" 
+                alt="ChainReach AI Logo" 
+                width={40} 
+                height={40}
+                className="object-contain"
+              />
+              <span className="text-2xl font-bold text-white">ChainReach AI</span>
             </div>
             <div className="flex items-center gap-6">
               <button 
@@ -95,8 +103,14 @@ export default function Home() {
         ) : (
           <div className="text-center max-w-4xl mx-auto">
             <div className="mb-8 animate-fade-in">
-              <div className="inline-flex items-center justify-center w-32 h-32 bg-white/10 backdrop-blur-lg rounded-full border-4 border-white/20 shadow-2xl mb-6">
-                <span className="text-6xl">🔗</span>
+              <div className="inline-flex items-center justify-center w-32 h-32 bg-white/10 backdrop-blur-lg rounded-full border-4 border-white/20 shadow-2xl mb-6 p-4">
+                <Image 
+                  src="/logo_wo_bg.png" 
+                  alt="ChainReach AI Logo" 
+                  width={96} 
+                  height={96}
+                  className="object-contain"
+                />
               </div>
               <h1 className="text-6xl md:text-7xl font-bold text-white mb-4 tracking-tight">
                 ChainReach AI
@@ -179,7 +193,6 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             <div className="p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:bg-white/15 transition-all">
-              <div className="text-4xl mb-3">📊</div>
               <h3 className="text-xl font-bold text-white mb-2">Person 1</h3>
               <p className="text-white/90 font-medium mb-2">Segmentation Lead</p>
               <p className="text-sm text-white/70 mb-3">Machine Learning Expert</p>
@@ -191,7 +204,6 @@ export default function Home() {
             </div>
 
             <div className="p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:bg-white/15 transition-all">
-              <div className="text-4xl mb-3">📝</div>
               <h3 className="text-xl font-bold text-white mb-2">Person 2</h3>
               <p className="text-white/90 font-medium mb-2">Content Strategy Lead</p>
               <p className="text-sm text-white/70 mb-3">Database & LangChain Expert</p>
@@ -203,7 +215,6 @@ export default function Home() {
             </div>
 
             <div className="p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:bg-white/15 transition-all">
-              <div className="text-4xl mb-3">🤖</div>
               <h3 className="text-xl font-bold text-white mb-2">Person 3</h3>
               <p className="text-white/90 font-medium mb-2">AI Generation Lead</p>
               <p className="text-sm text-white/70 mb-3">Azure AI Foundry Specialist</p>
@@ -215,7 +226,6 @@ export default function Home() {
             </div>
 
             <div className="p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:bg-white/15 transition-all">
-              <div className="text-4xl mb-3">✅</div>
               <h3 className="text-xl font-bold text-white mb-2">Person 4</h3>
               <p className="text-white/90 font-medium mb-2">Compliance Lead</p>
               <p className="text-sm text-white/70 mb-3">Content Safety Expert</p>
@@ -227,7 +237,6 @@ export default function Home() {
             </div>
 
             <div className="p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:bg-white/15 transition-all ring-2 ring-white/40">
-              <div className="text-4xl mb-3">🎯</div>
               <h3 className="text-xl font-bold text-white mb-2">Person 5</h3>
               <p className="text-white/90 font-medium mb-2">Integration Lead</p>
               <p className="text-sm text-white/70 mb-3">Orchestration Expert</p>
@@ -253,7 +262,7 @@ export default function Home() {
 
           <div className="space-y-8">
             <div className="p-8 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
-              <h3 className="text-2xl font-bold text-white mb-4">🎯 Project Overview</h3>
+              <h3 className="text-2xl font-bold text-white mb-4">Project Overview</h3>
               <p className="text-white/80 leading-relaxed">
                 ChainReach AI is an innovative multi-agent orchestration platform designed for modern marketing campaigns. 
                 Our system leverages 5 specialized AI agents working in harmony to deliver personalized, compliant, and 
@@ -262,7 +271,7 @@ export default function Home() {
             </div>
 
             <div className="p-8 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
-              <h3 className="text-2xl font-bold text-white mb-4">🔧 Technology Stack</h3>
+              <h3 className="text-2xl font-bold text-white mb-4">Technology Stack</h3>
               <div className="grid grid-cols-2 gap-4 text-white/80">
                 <div>
                   <p className="font-semibold text-white mb-2">Backend</p>
@@ -286,31 +295,27 @@ export default function Home() {
             </div>
 
             <div className="p-8 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
-              <h3 className="text-2xl font-bold text-white mb-4">✨ Key Features</h3>
+              <h3 className="text-2xl font-bold text-white mb-4">Key Features</h3>
               <ul className="space-y-3 text-white/80">
                 <li className="flex items-start gap-3">
-                  <span className="text-2xl">📊</span>
                   <div>
                     <p className="font-semibold text-white">Intelligent Segmentation</p>
                     <p className="text-sm">ML-powered customer segmentation based on behavior and demographics</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-2xl">🤖</span>
                   <div>
                     <p className="font-semibold text-white">AI Content Generation</p>
                     <p className="text-sm">GPT-4 powered personalized message creation</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-2xl">✅</span>
                   <div>
                     <p className="font-semibold text-white">Automated Compliance</p>
                     <p className="text-sm">Azure Content Safety ensures all messages meet regulatory standards</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-2xl">📈</span>
                   <div>
                     <p className="font-semibold text-white">Real-time Analytics</p>
                     <p className="text-sm">Live dashboards tracking campaign performance and agent health</p>
@@ -320,7 +325,7 @@ export default function Home() {
             </div>
 
             <div className="p-8 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
-              <h3 className="text-2xl font-bold text-white mb-4">🏆 Built For</h3>
+              <h3 className="text-2xl font-bold text-white mb-4">Built For</h3>
               <p className="text-white/80 leading-relaxed">
                 <strong className="text-white">Microsoft Innovative Challenge Fall 2025</strong><br />
                 A hackathon project showcasing the power of Azure AI and multi-agent systems in solving 
@@ -335,7 +340,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="relative z-10 py-8 text-center text-white/60 text-sm border-t border-white/20">
         <p>ChainReach AI | Microsoft Innovative Challenge Fall 2025</p>
-        <p className="mt-2">Team of 5 - Building the Future of AI Marketing 🚀</p>
+        <p className="mt-2">Team of 5 - Building the Future of AI Marketing</p>
       </footer>
 
       <style jsx>{`
