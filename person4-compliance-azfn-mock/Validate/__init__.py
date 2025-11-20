@@ -1,8 +1,19 @@
 import azure.functions as func
 import json
+from datetime import datetime
 from shared.contentsafety import analyze_message
+from threading import Lock
+
+request_count = 0
+count_lock = Lock()
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
+    global request_count
+
+    # Count request safely
+    with count_lock:
+        request_count += 1
+
     try:
         body = req.get_json()
     except:
@@ -12,23 +23,33 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             status_code=400
         )
 
-    messages = body.get("messages")
-
-    if not messages or not isinstance(messages, list):
+    if "messages" not in body:
         return func.HttpResponse(
             json.dumps({
-                "error": "messages must be a non-empty array",
+                "error": "Missing required field: messages",
                 "example": {"messages": ["text1", "text2"]}
             }),
             mimetype="application/json",
             status_code=400
         )
 
+    messages = body["messages"]
+
+    if not isinstance(messages, list) or len(messages) == 0:
+        return func.HttpResponse(
+            json.dumps({"error": "messages must be a non-empty array"}),
+            mimetype="application/json",
+            status_code=400
+        )
+
     results = []
+
+    # Process each message with mock analyzer
     for i, text in enumerate(messages):
         analysis = analyze_message(text)
+
         results.append({
-            "id": i,
+            "message_id": i,
             "text": text,
             "approved": analysis["approved"],
             "reason": analysis["reason"],
@@ -36,13 +57,17 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             "categories": analysis["categories"]
         })
 
+    final_response = {
+        "success": True,
+        "results": results,
+        "all_approved": all(r["approved"] for r in results),
+        "total_checked": len(results),
+        "mode": "LOCAL-MOCK",
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
     return func.HttpResponse(
-        json.dumps({
-            "success": True,
-            "total": len(results),
-            "all_approved": all(r["approved"] for r in results),
-            "results": results
-        }),
+        body=json.dumps(final_response),
         mimetype="application/json",
         status_code=200
     )
