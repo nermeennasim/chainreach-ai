@@ -153,7 +153,7 @@ if __name__ == "__main__":
     try:
         requests.get(f"{BASE_URL}/health", timeout=2)
         print("✅ Server is running!\n")
-    except:
+    except Exception:
         print("❌ Server is NOT running!")
         print(f"Please start the server first: python app.py\n")
         exit(1)
