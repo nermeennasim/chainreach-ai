@@ -1,8 +1,0 @@
-local.settings.json
-.env
-__pycache__/
-.env.*
-.vscode/
-.python_packages/
-
-.venv

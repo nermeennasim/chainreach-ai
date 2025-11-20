@@ -1,4 +1,0 @@
-// Integration tests directory
-// Add your integration tests here
-
-export {};
