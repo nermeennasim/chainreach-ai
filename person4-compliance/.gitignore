@@ -1,37 +1,8 @@
-# Python
-venv/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.py[cod]
-*$py.class
-.Python
-
-# Environment variables
+local.settings.json
 .env
-.env.local
-.env.*.local
-
-# IDE
+__pycache__/
+.env.*
 .vscode/
-.idea/
-*.swp
-*.swo
-*~
+.python_packages/
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Flask
-instance/
-.pytest_cache/
-
-# Logs
-*.log
-
-# Distribution / packaging
-dist/
-build/
-*.egg-info/
+.venv
