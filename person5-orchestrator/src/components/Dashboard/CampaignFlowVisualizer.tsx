@@ -209,7 +209,7 @@ export function CampaignFlowVisualizer() {
         if ('variantsGenerated' in agent && agent.variantsGenerated) {
           detail = `${agent.variantsGenerated} variants`;
         } else if ('approved' in agent && 'rejected' in agent) {
-          detail = `${agent.approved} ✅ ${agent.rejected} ❌`;
+          detail = `${agent.approved} approved, ${agent.rejected} rejected`;
         }
 
         return {
