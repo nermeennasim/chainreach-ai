@@ -120,7 +120,6 @@ export function generatePipelineStatus(): PipelineStatus {
     };
   }
 
-  const elapsed = Date.now() - currentCampaign.startTime;
   const progress = Math.min(currentCampaign.progress, 100);
   const total = currentCampaign.totalCustomers;
 

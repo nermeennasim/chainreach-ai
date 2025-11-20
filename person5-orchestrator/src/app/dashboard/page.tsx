@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { AgentStatusGrid } from '@/components/Dashboard/AgentStatusGrid';
 import { LiveMetricsCounter } from '@/components/Dashboard/LiveMetricsCounter';
 import { CampaignFlowVisualizer } from '@/components/Dashboard/CampaignFlowVisualizer';
@@ -13,11 +14,20 @@ export default function DashboardPage() {
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                ChainReach AI Dashboard
-              </h1>
-              <p className="text-gray-700 mt-1 font-medium">Multi-Agent Marketing Orchestration Platform</p>
+            <div className="flex items-center gap-3">
+              <Image 
+                src="/logo_wo_bg.png" 
+                alt="ChainReach AI Logo" 
+                width={50} 
+                height={50}
+                className="object-contain"
+              />
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  ChainReach AI Dashboard
+                </h1>
+                <p className="text-gray-700 mt-1 font-medium">Multi-Agent Marketing Orchestration Platform</p>
+              </div>
             </div>
             <div className="flex items-center gap-3">
               <Link href="/">
@@ -69,7 +79,7 @@ export default function DashboardPage() {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-16">
         <div className="max-w-7xl mx-auto px-6 py-6 text-center">
-          <p className="text-gray-700 font-medium">ChainReach AI - Built for Hackathon 2025 🚀</p>
+          <p className="text-gray-700 font-medium">ChainReach AI - Built for Hackathon 2025</p>
           <p className="mt-1 text-gray-600 text-sm">Multi-Agent Marketing Orchestration Platform</p>
         </div>
       </footer>

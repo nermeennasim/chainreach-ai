@@ -46,7 +46,7 @@ export function PerformanceCharts() {
       {/* Before/After Comparison Chart */}
       <Card className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          📊 Performance Comparison: Before vs After AI Orchestration
+          Performance Comparison: Before vs After AI Orchestration
         </h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={performanceData}>
@@ -82,7 +82,7 @@ export function PerformanceCharts() {
       {/* Real-Time Campaign Flow Chart */}
       <Card className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          📈 Real-Time Campaign Funnel
+          Real-Time Campaign Funnel
         </h3>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={timeSeriesData}>
