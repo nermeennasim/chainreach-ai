@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { Rocket, Loader2, CheckCircle2, XCircle, User, TrendingUp, Clock } from 'lucide-react';
 
@@ -99,11 +100,20 @@ export default function CampaignPage() {
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Campaign Runner
-              </h1>
-              <p className="text-gray-700 mt-1 font-medium">Execute campaigns with custom customer data</p>
+            <div className="flex items-center gap-3">
+              <Image 
+                src="/logo_wo_bg.png" 
+                alt="ChainReach AI Logo" 
+                width={50} 
+                height={50}
+                className="object-contain"
+              />
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  Campaign Runner
+                </h1>
+                <p className="text-gray-700 mt-1 font-medium">Execute campaigns with custom customer data</p>
+              </div>
             </div>
             <div className="flex items-center gap-3">
               <Link href="/">
@@ -288,7 +298,6 @@ export default function CampaignPage() {
         {results.length === 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <div className="text-3xl mb-3">📊</div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Customer Segmentation</h3>
               <p className="text-gray-600 text-sm">
                 ML-powered segmentation divides customers into targeted groups based on behavior and preferences.
@@ -296,7 +305,6 @@ export default function CampaignPage() {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <div className="text-3xl mb-3">🤖</div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">AI Content Generation</h3>
               <p className="text-gray-600 text-sm">
                 GPT-4 creates personalized marketing messages tailored to each customer segment.
@@ -304,7 +312,6 @@ export default function CampaignPage() {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <div className="text-3xl mb-3">✅</div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Compliance Checking</h3>
               <p className="text-gray-600 text-sm">
                 Azure Content Safety ensures all messages meet regulatory standards and brand guidelines.
@@ -359,7 +366,7 @@ export default function CampaignPage() {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-16">
         <div className="max-w-7xl mx-auto px-6 py-6 text-center">
-          <p className="text-gray-700 font-medium">ChainReach AI - Built for Hackathon 2025 🚀</p>
+          <p className="text-gray-700 font-medium">ChainReach AI - Built for Hackathon 2025</p>
           <p className="mt-1 text-gray-600 text-sm">Multi-Agent Marketing Orchestration Platform</p>
         </div>
       </footer>

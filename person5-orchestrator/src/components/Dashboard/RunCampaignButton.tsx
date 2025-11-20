@@ -153,7 +153,7 @@ export function RunCampaignButton({ onCampaignStart, onCampaignComplete }: RunCa
               </div>
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="font-semibold text-blue-900 mb-2">📊 Scroll down to watch:</p>
+                <p className="font-semibold text-blue-900 mb-2">Scroll down to watch:</p>
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• Campaign Flow Visualizer will light up in real-time</li>
                   <li>• Live Metrics will start incrementing</li>
