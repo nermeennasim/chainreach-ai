@@ -1,6 +1,0 @@
-POST http://localhost:7071/api/content-safety/analyze
-Content-Type: application/json
-
-{
-  "messages": ["i hate you", "hello world"]
-}
