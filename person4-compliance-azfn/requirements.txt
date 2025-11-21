@@ -2,3 +2,4 @@ azure-functions
 azure-ai-contentsafety
 azure-core
 requests
+python-dotenv
