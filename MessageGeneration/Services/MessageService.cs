@@ -31,7 +31,7 @@ public class MessageService
                     new AzureKeyCredential(apiKey)
                 );
                 _chatClient = _client.GetChatClient(_deploymentName);
-                _logger.LogInformation("✅ Azure OpenAI configured successfully");
+                _logger.LogInformation("Azure OpenAI configured successfully");
             }
             catch (Exception ex)
             {
@@ -40,7 +40,7 @@ public class MessageService
         }
         else
         {
-            _logger.LogWarning("⚠️ Azure OpenAI not configured - using mock mode");
+            _logger.LogWarning("Azure OpenAI not configured - using mock mode");
         }
     }
 
@@ -159,8 +159,8 @@ public class MessageService
 
         return tone switch
         {
-            "friendly" => $"Hi {name}! 👋 {content} - we thought you'd love this!",
-            "enthusiastic" => $"{name}! 🎉 Exciting news: {content} Don't miss out!",
+            "friendly" => $"Hi {name}! {content} - we thought you'd love this!",
+            "enthusiastic" => $"{name}! Exciting news: {content} Don't miss out!",
             "professional" => $"Dear {name}, you're eligible for: {content}. Best regards.",
             _ => $"Hello {name}, {content}"
         };
