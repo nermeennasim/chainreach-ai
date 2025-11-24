@@ -192,5 +192,59 @@ def by_customer() -> Tuple[Dict[str, Any], int]:
         return {"error": f"Server error: {str(e)}"}, 500
 
 
+@app.route("/api/segment", methods=["POST"])
+def segment_batch():
+    """
+    Batch segmentation for N customers.
+
+    Request JSON:
+    {
+        "customer_count": <int>
+    }
+
+    Returns:
+        List of segments with customers grouped by segment.
+    """
+    try:
+        data = request.get_json()
+
+        if not data or "customer_count" not in data:
+            return {"error": "Missing 'customer_count' in request"}, 400
+
+        customer_count = int(data["customer_count"])
+
+        # Load N customers from RFM
+        rfm_df = rfm_table.head(customer_count)
+
+        results = {}
+
+        for _, row in rfm_df.iterrows():
+            customer_id = int(row["CustomerID"])
+
+            # Predict segment
+            seg = predict_segment(
+                row["Recency"],
+                row["Frequency"],
+                row["Monetary"]
+            )
+
+            sid = seg["segment_id"]
+            sname = seg["segment_name"]
+
+            if sid not in results:
+                results[sid] = {
+                    "segment_id": sid,
+                    "segment_name": sname,
+                    "customers": []
+                }
+
+            results[sid]["customers"].append(customer_id)
+
+        return jsonify(list(results.values())), 200
+
+    except Exception as e:
+        return {"error": f"Server error: {str(e)}"}, 500
+
+
 if __name__ == "__main__":
-    app.run(port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)
