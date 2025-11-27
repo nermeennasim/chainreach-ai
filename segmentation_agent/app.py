@@ -10,10 +10,12 @@ Endpoints:
     POST /segment/customer: Predict segment for a customer by ID
 
 Environment Variables:
+    DATABASE_URL: PostgreSQL connection string
     MODEL_PATH: Path to trained K-Means model
     SCALER_PATH: Path to feature scaler
     PROFILES_PATH: Path to segment profiles JSON
-    RFM_PATH: Path to RFM analysis table CSV
+    RFM_PATH: Path to RFM analysis table CSV (fallback)
+    USE_CSV_FALLBACK: Enable CSV fallback if database unavailable
 """
 
 from flask import Flask, request, jsonify
@@ -22,15 +24,29 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import euclidean_distances
 import json
-from typing import Dict, Any, Tuple
+import os
+from typing import Dict, Any, Tuple, Optional
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Import database (with graceful fallback)
+try:
+    from database import get_db, CustomerRFM, db_available, init_db
+    print(f"🔌 Database module loaded. Available: {db_available}")
+except ImportError as e:
+    print(f"⚠️ Database module not available: {e}")
+    db_available = False
 
 # ============================================================================
 # ENVIRONMENT VARIABLES & CONFIGURATION
 # ============================================================================
-MODEL_PATH: str = "models/kmeans_model.pkl"
-SCALER_PATH: str = "models/scaler.pkl"
-PROFILES_PATH: str = "models/segment_profiles.json"
-RFM_PATH: str = "models/rfm_table.csv"
+MODEL_PATH: str = os.getenv("MODEL_PATH", "models/kmeans_model.pkl")
+SCALER_PATH: str = os.getenv("SCALER_PATH", "models/scaler.pkl")
+PROFILES_PATH: str = os.getenv("PROFILES_PATH", "models/segment_profiles.json")
+RFM_PATH: str = os.getenv("RFM_CSV_PATH", "models/rfm_table.csv")
+USE_CSV_FALLBACK: bool = os.getenv("USE_CSV_FALLBACK", "true").lower() == "true"
 
 # ============================================================================
 # FLASK APP INITIALIZATION
@@ -44,13 +60,28 @@ app = Flask(__name__)
 try:
     kmeans = joblib.load(MODEL_PATH)
     scaler = joblib.load(SCALER_PATH)
-    rfm_table = pd.read_csv(RFM_PATH)
     with open(PROFILES_PATH) as f:
         profiles = json.load(f)
+    print("✅ ML models loaded successfully")
 except FileNotFoundError as e:
     print(f"ERROR: Model artifact not found. Please run train_segmentation.py first.")
     print(f"Missing file: {e}")
     raise
+
+# Load CSV as fallback
+rfm_table: Optional[pd.DataFrame] = None
+if USE_CSV_FALLBACK or not db_available:
+    try:
+        rfm_table = pd.read_csv(RFM_PATH)
+        print(f"✅ CSV fallback loaded: {len(rfm_table)} customers")
+    except FileNotFoundError:
+        print(f"⚠️ CSV file not found: {RFM_PATH}")
+        if not db_available:
+            raise RuntimeError("Neither database nor CSV file available!")
+
+# Initialize database if available
+if db_available:
+    init_db()
 
 
 def predict_segment(recency: float, frequency: float, monetary: float) -> Dict[str, Any]:
@@ -153,6 +184,7 @@ def manual() -> Tuple[Dict[str, Any], int]:
 def by_customer() -> Tuple[Dict[str, Any], int]:
     """
     Predict segment for a specific customer by looking up their RFM values.
+    First tries database, falls back to CSV if unavailable.
     
     Request JSON:
     {
@@ -174,17 +206,38 @@ def by_customer() -> Tuple[Dict[str, Any], int]:
         if "customer_id" not in data:
             return {"error": "Missing 'customer_id' in request"}, 400
         
-        # Look up customer in RFM table
-        customer_id = data["customer_id"]
-        row = rfm_table[rfm_table["CustomerID"] == float(customer_id)]
+        customer_id = float(data["customer_id"])
         
-        if row.empty:
-            return {"error": f"Customer {customer_id} not found in RFM table"}, 404
+        # Try database first
+        if db_available:
+            db = get_db()
+            if db:
+                customer = db.query(CustomerRFM).filter(
+                    CustomerRFM.customer_id == customer_id
+                ).first()
+                db.close()
+                
+                if customer:
+                    seg = predict_segment(
+                        customer.recency,
+                        customer.frequency,
+                        customer.monetary
+                    )
+                    seg["data_source"] = "database"
+                    return jsonify(seg), 200
         
-        # Extract RFM values and predict
-        row = row.iloc[0]
-        seg = predict_segment(row["Recency"], row["Frequency"], row["Monetary"])
-        return jsonify(seg), 200
+        # Fallback to CSV
+        if rfm_table is not None:
+            row = rfm_table[rfm_table["CustomerID"] == customer_id]
+            
+            if not row.empty:
+                row = row.iloc[0]
+                seg = predict_segment(row["Recency"], row["Frequency"], row["Monetary"])
+                seg["data_source"] = "csv"
+                return jsonify(seg), 200
+        
+        # Customer not found in either source
+        return {"error": f"Customer {customer_id} not found"}, 404
         
     except ValueError as e:
         return {"error": f"Invalid customer_id: {str(e)}"}, 400
@@ -196,6 +249,7 @@ def by_customer() -> Tuple[Dict[str, Any], int]:
 def segment_batch():
     """
     Batch segmentation for N customers.
+    First tries database, falls back to CSV if unavailable.
 
     Request JSON:
     {
@@ -212,35 +266,72 @@ def segment_batch():
             return {"error": "Missing 'customer_count' in request"}, 400
 
         customer_count = int(data["customer_count"])
-
-        # Load N customers from RFM
-        rfm_df = rfm_table.head(customer_count)
-
         results = {}
+        data_source = "unknown"
 
-        for _, row in rfm_df.iterrows():
-            customer_id = int(row["CustomerID"])
+        # Try database first
+        if db_available:
+            db = get_db()
+            if db:
+                customers = db.query(CustomerRFM).limit(customer_count).all()
+                db.close()
+                
+                if customers:
+                    data_source = "database"
+                    for customer in customers:
+                        customer_id = int(customer.customer_id)
+                        
+                        seg = predict_segment(
+                            customer.recency,
+                            customer.frequency,
+                            customer.monetary
+                        )
+                        
+                        sid = seg["segment_id"]
+                        sname = seg["segment_name"]
+                        
+                        if sid not in results:
+                            results[sid] = {
+                                "segment_id": sid,
+                                "segment_name": sname,
+                                "customers": []
+                            }
+                        
+                        results[sid]["customers"].append(customer_id)
 
-            # Predict segment
-            seg = predict_segment(
-                row["Recency"],
-                row["Frequency"],
-                row["Monetary"]
-            )
+        # Fallback to CSV
+        if not results and rfm_table is not None:
+            data_source = "csv"
+            rfm_df = rfm_table.head(customer_count)
 
-            sid = seg["segment_id"]
-            sname = seg["segment_name"]
+            for _, row in rfm_df.iterrows():
+                customer_id = int(row["CustomerID"])
 
-            if sid not in results:
-                results[sid] = {
-                    "segment_id": sid,
-                    "segment_name": sname,
-                    "customers": []
-                }
+                seg = predict_segment(
+                    row["Recency"],
+                    row["Frequency"],
+                    row["Monetary"]
+                )
 
-            results[sid]["customers"].append(customer_id)
+                sid = seg["segment_id"]
+                sname = seg["segment_name"]
 
-        return jsonify(list(results.values())), 200
+                if sid not in results:
+                    results[sid] = {
+                        "segment_id": sid,
+                        "segment_name": sname,
+                        "customers": []
+                    }
+
+                results[sid]["customers"].append(customer_id)
+
+        response = {
+            "segments": list(results.values()),
+            "data_source": data_source,
+            "total_customers": sum(len(seg["customers"]) for seg in results.values())
+        }
+        
+        return jsonify(response), 200
 
     except Exception as e:
         return {"error": f"Server error: {str(e)}"}, 500
