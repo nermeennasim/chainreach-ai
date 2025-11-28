@@ -5,6 +5,16 @@ import segmentService from '../services/segmentService';
 
 class CustomerController {
   /**
+   * Helper method to parse ID and determine query type
+   */
+  private parseId(id: string): { isNumeric: boolean; parsedId: number | string } {
+    const isNumeric = /^\d+$/.test(id);
+    return {
+      isNumeric,
+      parsedId: isNumeric ? parseInt(id) : id
+    };
+  }
+  /**
    * GET /api/customers - List all customers
    */
   async listCustomers(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -60,10 +70,17 @@ class CustomerController {
     try {
       const { id } = req.params;
 
-      const result = await db.query<Customer>(
-        'SELECT * FROM customers WHERE id = $1 OR customer_id = $1',
-        [id]
-      );
+      const { isNumeric, parsedId } = this.parseId(id);
+      
+      const result = isNumeric 
+        ? await db.query<Customer>(
+            'SELECT * FROM customers WHERE id = $1',
+            [parsedId]
+          )
+        : await db.query<Customer>(
+            'SELECT * FROM customers WHERE customer_id = $1',
+            [parsedId]
+          );
 
       if (result.rows.length === 0) {
         res.status(404).json({
@@ -185,12 +202,15 @@ class CustomerController {
       }
 
       fields.push('updated_at = NOW()');
-      values.push(id);
 
+      const { isNumeric, parsedId } = this.parseId(id);
+      values.push(parsedId);
+      const whereClause = isNumeric ? `id = $${paramIndex}` : `customer_id = $${paramIndex}`;
+      
       const query = `
         UPDATE customers 
         SET ${fields.join(', ')}
-        WHERE id = $${paramIndex} OR customer_id = $${paramIndex}
+        WHERE ${whereClause}
         RETURNING *
       `;
 
@@ -220,10 +240,17 @@ class CustomerController {
     try {
       const { id } = req.params;
 
-      const result = await db.query(
-        'DELETE FROM customers WHERE id = $1 OR customer_id = $1 RETURNING id',
-        [id]
-      );
+      const { isNumeric, parsedId } = this.parseId(id);
+      
+      const result = isNumeric
+        ? await db.query(
+            'DELETE FROM customers WHERE id = $1 RETURNING id',
+            [parsedId]
+          )
+        : await db.query(
+            'DELETE FROM customers WHERE customer_id = $1 RETURNING id',
+            [parsedId]
+          );
 
       if (result.rows.length === 0) {
         res.status(404).json({
