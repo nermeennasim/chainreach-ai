@@ -5,7 +5,8 @@ Copy and paste these PowerShell commands to test all endpoints quickly.
 ## Prerequisites
 ```powershell
 # Make sure server is running
-cd "c:\Users\nerme\Desktop\hackathon AI-2025\chainreach-ai\segmentation-agent-node"
+# Replace with your actual path
+cd "path\to\chainreach-ai\segmentation-agent-node"
 npm run dev
 ```
 
@@ -201,7 +202,7 @@ $segments = (Invoke-RestMethod -Uri http://localhost:8001/api/segments).data
 foreach ($segment in $segments | Select-Object -First 3) {
     Write-Host "`nGenerating message for: $($segment.name)" -ForegroundColor Cyan
     $msg = Invoke-RestMethod -Uri "http://localhost:8001/api/segments/$($segment.id)/generate-message" -Method Post
-    Write-Host $msg.data.message.Substring(0, 200)... -ForegroundColor Gray
+    Write-Host "$($msg.data.message.Substring(0, 200))..." -ForegroundColor Gray
 }
 ```
 
