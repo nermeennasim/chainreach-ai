@@ -60,10 +60,18 @@ class CustomerController {
     try {
       const { id } = req.params;
 
-      const result = await db.query<Customer>(
-        'SELECT * FROM customers WHERE id = $1 OR customer_id = $1',
-        [id]
-      );
+      // Try to parse as integer, otherwise use as string for customer_id
+      const isNumeric = /^\d+$/.test(id);
+      
+      const result = isNumeric 
+        ? await db.query<Customer>(
+            'SELECT * FROM customers WHERE id = $1',
+            [parseInt(id)]
+          )
+        : await db.query<Customer>(
+            'SELECT * FROM customers WHERE customer_id = $1',
+            [id]
+          );
 
       if (result.rows.length === 0) {
         res.status(404).json({
@@ -187,10 +195,14 @@ class CustomerController {
       fields.push('updated_at = NOW()');
       values.push(id);
 
+      // Try to parse as integer, otherwise use as string for customer_id
+      const isNumeric = /^\d+$/.test(id);
+      const whereClause = isNumeric ? `id = $${paramIndex}` : `customer_id = $${paramIndex}`;
+      
       const query = `
         UPDATE customers 
         SET ${fields.join(', ')}
-        WHERE id = $${paramIndex} OR customer_id = $${paramIndex}
+        WHERE ${whereClause}
         RETURNING *
       `;
 
@@ -220,10 +232,18 @@ class CustomerController {
     try {
       const { id } = req.params;
 
-      const result = await db.query(
-        'DELETE FROM customers WHERE id = $1 OR customer_id = $1 RETURNING id',
-        [id]
-      );
+      // Try to parse as integer, otherwise use as string for customer_id
+      const isNumeric = /^\d+$/.test(id);
+      
+      const result = isNumeric
+        ? await db.query(
+            'DELETE FROM customers WHERE id = $1 RETURNING id',
+            [parseInt(id)]
+          )
+        : await db.query(
+            'DELETE FROM customers WHERE customer_id = $1 RETURNING id',
+            [id]
+          );
 
       if (result.rows.length === 0) {
         res.status(404).json({
