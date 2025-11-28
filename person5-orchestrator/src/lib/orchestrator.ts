@@ -43,8 +43,8 @@ export class Orchestrator {
       processedCustomers: results.length,
       approvedCount,
       rejectedCount,
-      successRate: (approvedCount / results.length) * 100,
-      averageProcessingTime: totalProcessingTime / results.length,
+      successRate: results.length > 0 ? (approvedCount / results.length) * 100 : 0,
+      averageProcessingTime: results.length > 0 ? totalProcessingTime / results.length : 0,
       results,
     };
   }

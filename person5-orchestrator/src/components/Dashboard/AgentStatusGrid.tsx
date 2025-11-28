@@ -14,6 +14,9 @@ interface AgentStatus {
     totalCalls: number;
     successRate: number;
     lastChecked: Date;
+    activeTimeHours?: number;
+    messagesProcessed?: number;
+    avgCallsPerMinute?: number;
   };
   recentErrors: Array<{
     timestamp: Date;
@@ -131,26 +134,42 @@ export function AgentStatusGrid() {
 
               <div className="space-y-1.5 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Avg Response:</span>
+                  <span className="text-gray-600">Response:</span>
                   <span className="font-medium">{agent.health.responseTime}ms</span>
                 </div>
                 
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Total Calls:</span>
-                  <span className="font-medium">{agent.health.totalCalls.toLocaleString()}</span>
-                </div>
-                
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Success Rate:</span>
-                  <span className="font-medium text-green-600">
-                    {agent.health.successRate}% ✅
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
                   <span className="text-gray-600">Uptime:</span>
                   <span className="font-medium">{agent.health.uptime}%</span>
                 </div>
+                
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Success:</span>
+                  <span className="font-medium text-green-600">
+                    {agent.health.successRate}%
+                  </span>
+                </div>
+
+                {agent.health.activeTimeHours && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Active:</span>
+                    <span className="font-medium">{agent.health.activeTimeHours}h</span>
+                  </div>
+                )}
+
+                {agent.health.messagesProcessed && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Messages:</span>
+                    <span className="font-medium">{agent.health.messagesProcessed.toLocaleString()}</span>
+                  </div>
+                )}
+
+                {agent.health.avgCallsPerMinute && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Calls/min:</span>
+                    <span className="font-medium">{agent.health.avgCallsPerMinute}</span>
+                  </div>
+                )}
               </div>
 
               {agent.recentErrors.length > 0 && (

@@ -73,21 +73,21 @@ export function RunCampaignButton({ onCampaignStart, onCampaignComplete }: RunCa
   return (
     <>
       {/* Run Campaign Button */}
-      <div className="bg-gradient-to-r from-primary to-secondary p-6 rounded-xl text-white shadow-lg">
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-6 rounded-xl text-white shadow-lg">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
               <Rocket className="h-6 w-6" />
               Run Sample Campaign
             </h2>
-            <p className="text-white/90 mb-4">
+            <p className="text-white mb-4">
               Click to see the full pipeline in action with demo data
             </p>
             <Button
               onClick={handleRunCampaign}
               disabled={loading}
               size="lg"
-              className="bg-white text-primary hover:bg-gray-100 font-semibold shadow-md hover:shadow-lg"
+              className="bg-white text-blue-600 hover:bg-gray-50 font-semibold shadow-md hover:shadow-lg transition-all"
             >
               {loading ? (
                 <>
@@ -153,7 +153,7 @@ export function RunCampaignButton({ onCampaignStart, onCampaignComplete }: RunCa
               </div>
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="font-semibold text-blue-900 mb-2">📊 Scroll down to watch:</p>
+                <p className="font-semibold text-blue-900 mb-2">Scroll down to watch:</p>
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• Campaign Flow Visualizer will light up in real-time</li>
                   <li>• Live Metrics will start incrementing</li>
