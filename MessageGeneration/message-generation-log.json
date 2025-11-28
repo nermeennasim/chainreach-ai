@@ -1,0 +1,98 @@
+[
+  {
+    "Timestamp": "2025-11-28T07:28:04.313542Z",
+    "MessageId": "MSG-de1200f0",
+    "CustomerId": "CUST-456",
+    "Segment": "new-customer",
+    "CustomerName": "Liam",
+    "ContentIds": [
+      "PROMO-010"
+    ],
+    "VariantCount": 3,
+    "GenerationTimeMs": 3,
+    "Variants": [
+      {
+        "VariantId": "MSG-de1200f0-FRI",
+        "Tone": "friendly",
+        "MessagePreview": "Hi Liam! Free shipping on your first order - we th...",
+        "CharacterCount": 72
+      },
+      {
+        "VariantId": "MSG-de1200f0-ENT",
+        "Tone": "enthusiastic",
+        "MessagePreview": "Liam! Exciting news: Free shipping on your first o...",
+        "CharacterCount": 70
+      },
+      {
+        "VariantId": "MSG-de1200f0-PRO",
+        "Tone": "professional",
+        "MessagePreview": "Dear Liam, you\u0027re eligible for: Free shipping on y...",
+        "CharacterCount": 80
+      }
+    ]
+  },
+  {
+    "Timestamp": "2025-11-28T07:28:45.865835Z",
+    "MessageId": "MSG-8a695653",
+    "CustomerId": "CUST-789",
+    "Segment": "at-risk-low-engagement",
+    "CustomerName": "Aisha",
+    "ContentIds": [
+      "PROMO-014"
+    ],
+    "VariantCount": 3,
+    "GenerationTimeMs": 0,
+    "Variants": [
+      {
+        "VariantId": "MSG-8a695653-FRI",
+        "Tone": "friendly",
+        "MessagePreview": "Hi Aisha! We miss you! Enjoy 20% off your next pur...",
+        "CharacterCount": 85
+      },
+      {
+        "VariantId": "MSG-8a695653-ENT",
+        "Tone": "enthusiastic",
+        "MessagePreview": "Aisha! Exciting news: We miss you! Enjoy 20% off y...",
+        "CharacterCount": 83
+      },
+      {
+        "VariantId": "MSG-8a695653-PRO",
+        "Tone": "professional",
+        "MessagePreview": "Dear Aisha, you\u0027re eligible for: We miss you! Enjo...",
+        "CharacterCount": 93
+      }
+    ]
+  },
+  {
+    "Timestamp": "2025-11-28T07:29:03.08111Z",
+    "MessageId": "MSG-4e237992",
+    "CustomerId": "CUST-234",
+    "Segment": "high-value-occasional",
+    "CustomerName": "Daniel",
+    "ContentIds": [
+      "PROMO-021"
+    ],
+    "VariantCount": 3,
+    "GenerationTimeMs": 0,
+    "Variants": [
+      {
+        "VariantId": "MSG-4e237992-FRI",
+        "Tone": "friendly",
+        "MessagePreview": "Hi Daniel! Exclusive early access to new arrivals ...",
+        "CharacterCount": 79
+      },
+      {
+        "VariantId": "MSG-4e237992-ENT",
+        "Tone": "enthusiastic",
+        "MessagePreview": "Daniel! Exciting news: Exclusive early access to n...",
+        "CharacterCount": 77
+      },
+      {
+        "VariantId": "MSG-4e237992-PRO",
+        "Tone": "professional",
+        "MessagePreview": "Dear Daniel, you\u0027re eligible for: Exclusive early ...",
+        "CharacterCount": 87
+      }
+    ]
+  }
+]

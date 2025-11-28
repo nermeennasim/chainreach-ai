@@ -57,5 +57,38 @@ public class MessageController : ControllerBase
         deploymentName = deployment,
         status = hasKey && !string.IsNullOrEmpty(endpoint) ? "configured" : "not configured"
     });
+    }
+    [HttpGet("logs")]
+    public async Task<IActionResult> GetLogs([FromQuery] int limit = 10)
+    {
+    try
+    {
+        var logFile = "message-generation-log.json";
+        
+        if (!System.IO.File.Exists(logFile))
+        {
+            return Ok(new { message = "No logs yet", logs = new List<object>() });
+        }
+
+        var content = await System.IO.File.ReadAllTextAsync(logFile);
+        var logs = System.Text.Json.JsonSerializer.Deserialize<List<object>>(content) 
+                   ?? new List<object>();
+
+        // Return last N entries
+        var recentLogs = logs.TakeLast(limit).ToList();
+
+        return Ok(new 
+        { 
+            total = logs.Count,
+            showing = recentLogs.Count,
+            logs = recentLogs 
+        });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Failed to read logs");
+        return StatusCode(500, new { error = "Failed to read logs" });
+    }
+
 }
 }

@@ -4,6 +4,7 @@ using System.ClientModel;
 using MessageGeneration.DTOs;
 using Azure.AI.OpenAI;
 using OpenAI.Chat;
+using System.Text.Json;
 
 public class MessageService
 {
@@ -109,7 +110,8 @@ public class MessageService
             variants.Count, 
             sw.ElapsedMilliseconds
         );
-
+        var response = new MessageResponse(messageId, DateTime.UtcNow, variants, sw.ElapsedMilliseconds);
+        await LogGenerationAsync(response, request);
         return new MessageResponse(messageId, DateTime.UtcNow, variants, sw.ElapsedMilliseconds);
     }
 
@@ -164,5 +166,69 @@ public class MessageService
             "professional" => $"Dear {name}, you're eligible for: {content}. Best regards.",
             _ => $"Hello {name}, {content}"
         };
+    }
+    // Add to MessageService.cs
+    private async Task LogGenerationAsync(MessageResponse response, MessageRequest request)
+    {
+        try
+        {
+            var logEntry = new
+            {
+                Timestamp = DateTime.UtcNow,
+                MessageId = response.MessageId,
+                CustomerId = request.CustomerId,
+                Segment = request.Segment,
+                CustomerName = request.CustomerContext.Name,
+                ContentIds = request.ApprovedContent.Select(c => c.ContentId).ToList(),
+                VariantCount = response.Variants.Count,
+                GenerationTimeMs = response.GenerationTimeMs,
+                Variants = response.Variants.Select(v => new
+                {
+                    v.VariantId,
+                    v.Tone,
+                    MessagePreview = v.Message.Length > 50 ? v.Message[..50] + "..." : v.Message,
+                    v.CharacterCount
+                }).ToList()
+            };
+
+            var logFile = "message-generation-log.json";
+            var logs = new List<object>();
+
+            // Read existing logs if file exists
+            if (File.Exists(logFile))
+            {
+                var existingContent = await File.ReadAllTextAsync(logFile);
+                if (!string.IsNullOrWhiteSpace(existingContent))
+                {
+                    logs = System.Text.Json.JsonSerializer.Deserialize<List<object>>(existingContent) 
+                       ?? new List<object>();
+                }
+            }
+
+            // Add new log entry
+            logs.Add(logEntry);
+
+            // last 100 entries to prevent file from getting too large
+            if (logs.Count > 100)
+            {
+                logs = logs.Skip(logs.Count - 100).ToList();
+            }
+
+            // Write back to file
+            await File.WriteAllTextAsync(
+                logFile,
+                JsonSerializer.Serialize(logs, new System.Text.Json.JsonSerializerOptions 
+                { 
+                    WriteIndented = true 
+                })
+            );
+
+            _logger.LogDebug("Logged generation to {LogFile}", logFile);
+        }
+        catch (Exception ex)
+        {
+        
+        _logger.LogWarning(ex, "Failed to log generation, but continuing normally");
+        }
     }
 }
