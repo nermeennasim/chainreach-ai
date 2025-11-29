@@ -105,16 +105,43 @@ export default function CampaignDashboard({ campaignId: initialCampaignId }: Cam
   };
 
   const generateCustomerEmails = (count: number) => {
-    const statuses = ['sent', 'delivered', 'opened', 'clicked', 'converted'];
-    const emails = Array.from({ length: count }, (_, i) => ({
+    // Funnel metrics: 100 sent, 96 delivered, 72 opened, 40 clicked, 12 converted
+    const statusCounts = {
+      sent: 100,
+      delivered: 96,
+      opened: 72,
+      clicked: 40,
+      converted: 12,
+    };
+    // Build the status array according to the counts
+    let statuses: string[] = [];
+    Object.entries(statusCounts).forEach(([status, num]) => {
+      statuses = statuses.concat(Array(num).fill(status));
+    });
+    // If count is less than total, slice; if more, pad with 'sent'
+    if (statuses.length > count) {
+      statuses = statuses.slice(0, count);
+    } else if (statuses.length < count) {
+      statuses = statuses.concat(Array(count - statuses.length).fill('sent'));
+    }
+    // Shuffle statuses to randomize order
+    for (let i = statuses.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [statuses[i], statuses[j]] = [statuses[j], statuses[i]];
+    }
+    const emails = statuses.map((status, i) => ({
       id: i + 1,
       email: `customer${i + 1}@example.com`,
       name: `Customer ${i + 1}`,
-      status: statuses[Math.floor(Math.random() * statuses.length)],
+      status,
       sentAt: new Date(Date.now() - Math.random() * 3600000).toLocaleTimeString(),
-      openedAt: Math.random() > 0.4 ? new Date(Date.now() - Math.random() * 1800000).toLocaleTimeString() : null,
-      clickedAt: Math.random() > 0.7 ? new Date(Date.now() - Math.random() * 900000).toLocaleTimeString() : null,
-      revenue: Math.random() > 0.8 ? Math.floor(Math.random() * 500) + 50 : 0,
+      openedAt: ['opened', 'clicked', 'converted'].includes(status)
+        ? new Date(Date.now() - Math.random() * 1800000).toLocaleTimeString()
+        : null,
+      clickedAt: ['clicked', 'converted'].includes(status)
+        ? new Date(Date.now() - Math.random() * 900000).toLocaleTimeString()
+        : null,
+      revenue: status === 'converted' ? Math.floor(Math.random() * 500) + 50 : 0,
     }));
     setCustomerEmails(emails);
   };
