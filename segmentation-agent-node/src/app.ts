@@ -170,7 +170,8 @@ app.use((req: Request, res: Response) => {
 // Global error handler
 app.use(errorHandler);
 
-const PORT = parseInt(process.env.PORT || '8001');
+const PORT = parseInt(process.env.PORT || '8000', 10);
+
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {

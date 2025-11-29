@@ -507,7 +507,7 @@ az webapp config appsettings set `
     DB_HOST=chainreach-db.postgres.database.azure.com `
     DB_DATABASE=chainreach_prod `
     DB_USER=chainreach_admin `
-    DB_PASSWORD=ChainReach2024! `
+    DB_PASSWORD=<YOUR_DB_PASSWORD> `
     DB_PORT=5432 `
     DB_SSL=true `
     AZURE_OPENAI_ENDPOINT=YOUR_AZURE_OPENAI_ENDPOINT `
@@ -655,7 +655,7 @@ SELECT COUNT(*) FROM customers;
 ### **Issue: Azure OpenAI not working**
 ```powershell
 # Test endpoint
-curl -X POST "https://nerme-mih8otmt-eastus2.cognitiveservices.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-04-01-preview" `
+curl -X POST "<YOUR_AZURE_OPENAI_ENDPOINT>/openai/deployments/gpt-4o/chat/completions?api-version=2024-04-01-preview" `
   -H "api-key: YOUR_KEY" `
   -H "Content-Type: application/json" `
   -d '{"messages":[{"role":"user","content":"test"}]}'

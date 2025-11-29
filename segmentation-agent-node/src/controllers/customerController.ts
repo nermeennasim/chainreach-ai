@@ -268,6 +268,116 @@ class CustomerController {
       next(error);
     }
   }
+
+  /**
+   * POST /api/customers/bulk/generate - Generate N sample customers
+   */
+  async bulkGenerateCustomers(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { count = 25 } = req.body;
+
+      if (!count || count < 1 || count > 10000) {
+        res.status(400).json({
+          success: false,
+          error: 'Count must be between 1 and 10000',
+        });
+        return;
+      }
+
+      // Sample data variations for realistic generation
+      const industries = [
+        'Technology', 'Finance', 'Healthcare', 'Retail', 'Manufacturing',
+        'Pharmaceuticals', 'Energy', 'Telecommunications', 'Media', 'Insurance'
+      ];
+
+      const locations = [
+        'New York', 'San Francisco', 'Los Angeles', 'Chicago', 'Boston',
+        'Seattle', 'Austin', 'Denver', 'Miami', 'Atlanta'
+      ];
+
+      const companies = [
+        'Tech Solutions Inc', 'Global Finance Corp', 'Health Systems LLC', 'Retail Group', 'Factory Pro',
+        'Pharma Research', 'Energy Solutions', 'Telecom Global', 'Media Holdings', 'Insurance Plus'
+      ];
+
+      const generateCustomer = (index: number) => {
+        const industry = industries[Math.floor(Math.random() * industries.length)];
+        const location = locations[Math.floor(Math.random() * locations.length)];
+        const company = companies[Math.floor(Math.random() * companies.length)];
+        const employees = Math.floor(Math.random() * 5000) + 25;
+        const purchases = Math.floor(Math.random() * 500000) + 5000;
+        const score = Math.floor(Math.random() * 100);
+
+        return {
+          customer_id: `CUST-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 5)}`,
+          name: `Customer ${index + 1}`,
+          email: `customer${index + 1}+${Date.now()}@example.com`,
+          phone: `+1-${Math.floor(Math.random() * 9000000000) + 1000000000}`,
+          company: `${company} ${index}`,
+          industry,
+          revenue: purchases * (Math.random() * 3 + 1),
+          employee_count: employees,
+          location,
+          country: 'USA',
+          total_purchases: purchases,
+          purchase_count: Math.floor(Math.random() * 50) + 1,
+          email_opens: Math.floor(Math.random() * 200),
+          email_clicks: Math.floor(Math.random() * 100),
+          website_visits: Math.floor(Math.random() * 500),
+        };
+      };
+
+      const createdCustomers: Customer[] = [];
+      const errors: any[] = [];
+
+      // Create customers in batches of 10 for better performance
+      const batchSize = 10;
+      for (let i = 0; i < count; i += batchSize) {
+        const batchPromises = [];
+        for (let j = 0; j < batchSize && (i + j) < count; j++) {
+          const customer = generateCustomer(i + j);
+          const promise = this.createCustomer(
+            { body: customer } as Request,
+            {
+              json: (data: any) => {
+                if (data.success) {
+                  createdCustomers.push(data.data);
+                } else {
+                  errors.push({ customer_id: customer.customer_id, error: data.error });
+                }
+              },
+              status: (code: number) => ({
+                json: (data: any) => {
+                  if (code >= 400) {
+                    errors.push({ customer_id: customer.customer_id, error: data.error });
+                  }
+                }
+              })
+            } as Response,
+            (err: any) => {
+              errors.push({ customer_id: customer.customer_id, error: err.message });
+            }
+          );
+          batchPromises.push(promise);
+        }
+        await Promise.all(batchPromises);
+      }
+
+      res.status(201).json({
+        success: true,
+        message: `Generated ${createdCustomers.length} customers`,
+        data: {
+          created: createdCustomers.length,
+          failed: errors.length,
+          total_requested: count,
+          customers: createdCustomers,
+          errors: errors.length > 0 ? errors.slice(0, 5) : undefined, // Show first 5 errors
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new CustomerController();

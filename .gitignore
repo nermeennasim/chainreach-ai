@@ -161,3 +161,41 @@ obj/
 
 # Misc
 dy
+# Build results
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Rider
+.idea/
+
+# Azure and secrets
+appsettings.Development.json
+*.secret
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+packages/
+
+# Logs
+*.log
+# Ignore Python virtual environments
+venv/
+segmentation_agent/venv/
+
+# Python cache files
+__pycache__/
+*.pyc

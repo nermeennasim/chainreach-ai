@@ -23,7 +23,7 @@ az postgres flexible-server create `
   --resource-group chainreach-ai `
   --location centralus `
   --admin-user dbadmin `
-  --admin-password "ChainReach2025!" `
+  --admin-password "<YOUR_DB_ADMIN_PASSWORD>" `
   --sku-name Standard_B1ms `
   --tier Burstable `
   --storage-size 32 `
@@ -47,7 +47,7 @@ az postgres flexible-server firewall-rule create `
 ### Initialize Database Schema
 ```powershell
 # Connect and run init script
-psql "host=chainreach-db-node.postgres.database.azure.com port=5432 dbname=chainreach_db user=dbadmin password=ChainReach2025! sslmode=require" -f scripts/init-db.sql
+psql "host=chainreach-db-node.postgres.database.azure.com port=5432 dbname=chainreach_db user=dbadmin password=<YOUR_DB_PASSWORD> sslmode=require" -f scripts/init-db.sql
 ```
 
 ## Step 2: Build Application
@@ -97,7 +97,7 @@ az webapp config appsettings set `
     DB_PORT=5432 `
     DB_NAME="chainreach_db" `
     DB_USER="dbadmin" `
-    DB_PASSWORD="ChainReach2025!" `
+    DB_PASSWORD="<YOUR_DB_PASSWORD>" `
     DB_SSL=true `
     AZURE_OPENAI_ENDPOINT="YOUR_ENDPOINT" `
     AZURE_OPENAI_KEY="YOUR_KEY" `
@@ -174,7 +174,7 @@ az containerapp create `
     DB_PORT=5432 `
     DB_NAME="chainreach_db" `
     DB_USER="dbadmin" `
-    DB_PASSWORD="ChainReach2025!" `
+    DB_PASSWORD="<YOUR_DB_PASSWORD>" `
     DB_SSL=true `
     AZURE_OPENAI_ENDPOINT="YOUR_ENDPOINT" `
     AZURE_OPENAI_KEY="YOUR_KEY"
@@ -228,7 +228,7 @@ az webapp restart `
 
 ### Test Database Connection
 ```bash
-psql "host=chainreach-db-node.postgres.database.azure.com port=5432 dbname=chainreach_db user=dbadmin password=ChainReach2025! sslmode=require" -c "SELECT NOW();"
+psql "host=chainreach-db-node.postgres.database.azure.com port=5432 dbname=chainreach_db user=dbadmin password=<YOUR_DB_PASSWORD> sslmode=require" -c "SELECT NOW();"
 ```
 
 ## Cost Optimization

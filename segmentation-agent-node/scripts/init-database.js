@@ -33,24 +33,12 @@ async function initDatabase() {
     console.log('📋 Executing database initialization script...');
     console.log('');
     
-    // Execute SQL (split by semicolon and execute each statement)
-    const statements = sql
-      .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'));
-    
-    for (let i = 0; i < statements.length; i++) {
-      const statement = statements[i];
-      if (statement) {
-        try {
-          await pool.query(statement);
-        } catch (err) {
-          // Ignore "already exists" errors
-          if (!err.message.includes('already exists')) {
-            console.warn(`⚠️  Warning: ${err.message.split('\n')[0]}`);
-          }
-        }
-      }
+    // Execute entire SQL as one transaction
+    try {
+      await pool.query(sql);
+    } catch (err) {
+      // Log warning but continue
+      console.warn(`⚠️  SQL execution note: ${err.message.split('\n')[0]}`);
     }
     
     console.log('✅ Database schema initialized successfully!');

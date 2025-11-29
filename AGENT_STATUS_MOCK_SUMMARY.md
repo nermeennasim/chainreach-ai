@@ -1,0 +1,349 @@
+# Campaign Orchestration - Agent Status & Mock Configuration
+
+**Status Date:** November 28, 2025  
+**Configuration:** Demo Campaign with Mocked Agents 2 & 3
+
+---
+
+## 🎯 Agent Status Overview
+
+| Agent | Name | Status | Type | Endpoint | Details |
+|-------|------|--------|------|----------|---------|
+| **Agent 1** | Segmentation | ✅ REAL | Live API | `segmentation-agent-node:3001` | Fetches real customer segments & data |
+| **Agent 2** | Content Retrieval | 🔄 MOCKED | Endpoint | `/api/agents/agent-2-content-retrieval` | Returns 5 mock content templates |
+| **Agent 3** | Message Generation | 🔄 MOCKED | Endpoint | `/api/agents/agent-3-message-generation` | Generates 3 variants per customer |
+| **Agent 4** | Compliance Check | ✅ REAL | Live API | `chainreach-compliance-func.azurewebsites.net` | Azure Content Safety scoring (0-6 scale) |
+| **Agent 5** | Send Orchestration | ✅ REAL | Logic | Internal | Manages approved message delivery |
+
+---
+
+## 📊 Agent 2: Content Retrieval (MOCKED)
+
+### Endpoint
+```
+POST /api/agents/agent-2-content-retrieval
+```
+
+### Purpose
+Simulates retrieving content templates from RAG API instead of calling `person2-rag-nodejs` in production.
+
+### Mock Templates Available
+1. **Premium Offer Launch** - TEMP001
+   - Subject: "Exclusive Premium Access - Limited Time"
+   - Category: premium
+   - Status: APPROVED
+
+2. **Seasonal Sale Announcement** - TEMP002
+   - Subject: "Special Seasonal Sale - Save Up to 40%"
+   - Category: sales
+   - Status: APPROVED
+
+3. **Customer Success Story** - TEMP003
+   - Subject: "See How {company_name} Achieved Success"
+   - Category: engagement
+   - Status: APPROVED
+
+4. **Product Feature Update** - TEMP004
+   - Subject: "New Features Available - Enhance Your Experience"
+   - Category: product
+   - Status: APPROVED
+
+5. **VIP Loyalty Reward** - TEMP005
+   - Subject: "Your VIP Reward - Exclusive Perks Inside"
+   - Category: loyalty
+   - Status: APPROVED
+
+### Request Body
+```json
+{
+  "query": "enterprise solutions",
+  "limit": 5,
+  "category": "premium"  // optional
+}
+```
+
+### Response Example
+```json
+{
+  "success": true,
+  "source": "MOCK_AGENT_2_CONTENT_RETRIEVAL",
+  "query": "enterprise solutions",
+  "limit": 5,
+  "results_count": 5,
+  "results": [
+    {
+      "template_id": "TEMP001",
+      "template_name": "Premium Offer Launch",
+      "subject": "Exclusive Premium Access - Limited Time",
+      "body": "Hi {customer_name}, we're thrilled...",
+      "category": "premium",
+      "approved_date": "2025-11-28T...",
+      "approval_status": "APPROVED",
+      "tags": ["premium", "launch", "exclusive", "enterprise"]
+    },
+    // ... 4 more templates
+  ],
+  "metadata": {
+    "total_templates_available": 5,
+    "processing_time_ms": 500,
+    "is_mock": true,
+    "note": "This is mock data. In production, this would retrieve from person2-rag-nodejs"
+  }
+}
+```
+
+---
+
+## 🎨 Agent 3: Message Generation (MOCKED)
+
+### Endpoint
+```
+POST /api/agents/agent-3-message-generation
+```
+
+### Purpose
+Simulates generating personalized message variants for each customer based on segment and preferences.
+
+### Mock Variant Generation Logic
+- **Variants per Customer:** 3 (Type A, B, C)
+- **Personalization Approach:**
+  - Variant A: Direct benefit-focused (Personalization Score: 0.85)
+  - Variant B: Segment-recognition approach (Personalization Score: 0.78)
+  - Variant C: Premium/VIP approach (Personalization Score: 0.82)
+
+### Supported Segments
+1. **premium** - Premium tier customers
+2. **high_value** - High monetary value
+3. **engaged** - Highly engaged users
+4. **retention** - At-risk customers
+5. **general** - Default segment
+
+### Request Body
+```json
+{
+  "customers": [
+    {
+      "customer_id": "12347",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "recency": 2,
+      "frequency": 7,
+      "monetary": 4310
+    }
+    // ... more customers
+  ],
+  "template_id": "default",
+  "segment": "general",
+  "variants_per_customer": 3
+}
+```
+
+### Response Example
+```json
+{
+  "success": true,
+  "source": "MOCK_AGENT_3_MESSAGE_GENERATION",
+  "template_id": "default",
+  "segment": "general",
+  "customers_processed": 10,
+  "total_variants_generated": 30,
+  "variants_per_customer": 3,
+  "variants": [
+    {
+      "variant_id": "VAR457829_A",
+      "customer_id": "12347",
+      "customer_name": "John Doe",
+      "segment": "general",
+      "variant_type": "A",
+      "message": "Hi John Doe, explore our latest solutions designed to transform your business. Discover what innovation looks like.",
+      "personalization_score": 0.85,
+      "generated_at": "2025-11-28T..."
+    },
+    // ... 29 more variants
+  ],
+  "metadata": {
+    "processing_time_ms": 850,
+    "average_personalization_score": "0.82",
+    "is_mock": true,
+    "note": "This is mock data. In production, variants would be generated by an LLM service."
+  }
+}
+```
+
+---
+
+## 🔄 Demo Campaign Flow
+
+When you click "Start Campaign" on `/campaign/demo`:
+
+### Step 1: Agent 1 - Segmentation (REAL) ✅
+- Fetches real customer segments from `segmentation-agent-node:3001`
+- Retrieves real customer data (name, email, RFM metrics)
+- Status: Live connection to running service
+
+### Step 2: Agent 2 - Content Retrieval (MOCKED) 🔄
+- Calls `/api/agents/agent-2-content-retrieval`
+- Returns 5 pre-defined mock templates
+- Processing time: ~500ms (simulated)
+- Status: Internal mock endpoint
+
+### Step 3: Agent 3 - Message Generation (MOCKED) 🔄
+- Calls `/api/agents/agent-3-message-generation`
+- Generates 3 variants per customer (A, B, C types)
+- Processing time: ~100-2000ms (based on customer count)
+- Status: Internal mock endpoint
+
+### Step 4: Agent 4 - Compliance Check (REAL) ✅
+- Sends all generated messages to Azure Content Safety
+- Analyzes: hate, sexual, violence, self_harm (0-6 scale)
+- Any score > 0 = REJECTED
+- All scores = 0 = APPROVED
+- Status: Live Azure service
+
+### Step 5: Agent 5 - Send Orchestration (REAL) ✅
+- Manages approved messages
+- Tracks delivery metrics
+- Status: Internal logic (no external API call)
+
+---
+
+## 📋 Migration Plan (From Mocks to Real APIs)
+
+When services are ready, replace mocks with real endpoints:
+
+### Agent 2 → person2-rag-nodejs
+```
+Current: POST /api/agents/agent-2-content-retrieval
+Future:  POST http://localhost:8000/api/generate-content
+```
+
+**Action Required:**
+1. Start `person2-rag-nodejs` service
+2. Update `useOrchestrator.ts` Agent 2 section
+3. Replace mock endpoint URL with real RAG API URL
+4. Test content retrieval with actual RAG database
+
+### Agent 3 → LLM Service
+```
+Current: POST /api/agents/agent-3-message-generation
+Future:  POST {LLM_SERVICE}/api/generate-variants
+```
+
+**Action Required:**
+1. Deploy/connect LLM service (OpenAI, Azure OpenAI, etc.)
+2. Update `useOrchestrator.ts` Agent 3 section
+3. Replace mock generation with LLM prompts
+4. Implement variant A/B/C strategy in LLM calls
+
+---
+
+## 🚀 How to Test Demo Campaign with Mocks
+
+### Prerequisites
+- Dashboard running at `http://localhost:3000`
+- Agent 1 (Segmentation) running at `http://localhost:3001`
+- Agent 4 (Compliance) accessible at Azure endpoint
+
+### Steps
+1. Navigate to `/campaign/demo`
+2. Click "Start Campaign" button
+3. Monitor agent progress:
+   - Agent 1 ✅ Connects to real segmentation API
+   - Agent 2 🔄 Uses mock templates (~500ms)
+   - Agent 3 🔄 Generates mock variants (~500-2000ms)
+   - Agent 4 ✅ Validates with Azure Content Safety
+   - Agent 5 ✅ Completes orchestration
+
+### Expected Results
+- ✅ Agent 1: Real segments loaded
+- ✅ Agent 2: 5 mock templates retrieved
+- ✅ Agent 3: 30 mock variants generated (10 customers × 3 variants)
+- ✅ Agent 4: Compliance scores for all 30 variants
+- ✅ Agent 5: Messages categorized as APPROVED/REJECTED
+- ✅ All agents show 100% completion in dashboard
+
+---
+
+## 📝 Key Differences: Mock vs Real
+
+### Mock Agent 2 (Content Retrieval)
+- **Speed:** Fast (~500ms)
+- **Content:** Pre-defined 5 templates
+- **Customization:** Limited (query matching only)
+- **Cost:** Free
+- **Reliability:** 100% (no external dependency)
+
+### Real Agent 2 (RAG API)
+- **Speed:** Variable (1-5s depending on DB)
+- **Content:** Dynamic from vector database
+- **Customization:** Full semantic search
+- **Cost:** Based on compute/storage
+- **Reliability:** Depends on service availability
+
+---
+
+## 🎯 Next Steps
+
+### Immediate (Demo Ready)
+✅ Mock endpoints created  
+✅ useOrchestrator updated  
+✅ Dashboard ready for testing  
+
+### Short-term (Next Sprint)
+- [ ] Deploy `person2-rag-nodejs` with actual RAG database
+- [ ] Integrate real RAG API into Agent 2
+- [ ] Update Agent 3 with LLM service
+- [ ] Performance testing with real data
+
+### Long-term
+- [ ] Full production deployment
+- [ ] Multi-tenant support
+- [ ] Advanced personalization
+- [ ] Analytics dashboard enhancements
+
+---
+
+## 📊 Mock Data Statistics
+
+### Agent 2 (Content Retrieval)
+- Templates: 5 pre-defined
+- Categories: premium, sales, engagement, product, loyalty
+- Fields per template: 7 (id, name, subject, body, category, date, tags)
+- Mock response size: ~2KB
+
+### Agent 3 (Message Generation)
+- Sample customers: 10 (from SAMPLE_CUSTOMERS)
+- Variants per customer: 3 (A, B, C)
+- Total variants in demo: 30
+- Fields per variant: 7 (id, customer_id, name, segment, type, message, score)
+- Mock response size: ~4-5KB
+
+---
+
+## 🔗 File Locations
+
+| File | Purpose |
+|------|---------|
+| `/app/api/agents/agent-2-content-retrieval/route.ts` | Mock Agent 2 endpoint |
+| `/app/api/agents/agent-3-message-generation/route.ts` | Mock Agent 3 endpoint |
+| `/hooks/useOrchestrator.ts` | Updated to use mock endpoints |
+| `/app/campaign/demo/page.tsx` | Demo campaign UI |
+
+---
+
+## ✅ Verification Checklist
+
+- [x] Agent 2 mock endpoint created
+- [x] Agent 3 mock endpoint created
+- [x] useOrchestrator updated
+- [ ] Test demo campaign runs without errors
+- [ ] All 5 agents show progress
+- [ ] Compliance results display correctly
+- [ ] Execution logs show all agent activities
+- [ ] Mock data looks realistic
+
+---
+
+**Created:** November 28, 2025  
+**Status:** Ready for Demo Testing  
+**Next Update:** After real API integration
