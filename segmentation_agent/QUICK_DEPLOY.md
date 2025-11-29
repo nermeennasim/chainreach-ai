@@ -23,7 +23,7 @@ az postgres flexible-server create `
   --name chainreach-db `
   --location eastus `
   --admin-user dbadmin `
-  --admin-password "ChainReach2025!" `
+  --admin-password "<YOUR_DB_ADMIN_PASSWORD>" `
   --sku-name Standard_B1ms `
   --tier Burstable `
   --storage-size 32 `
@@ -38,7 +38,7 @@ az postgres flexible-server db create `
 
 # 2. Create .env file
 @"
-DATABASE_URL=postgresql://dbadmin:ChainReach2025!@chainreach-db.postgres.database.azure.com:5432/chainreach_prod?sslmode=require
+DATABASE_URL=postgresql://dbadmin:<YOUR_DB_PASSWORD>@chainreach-db.postgres.database.azure.com:5432/chainreach_prod?sslmode=require
 USE_CSV_FALLBACK=true
 "@ | Out-File -FilePath .env -Encoding utf8
 
@@ -66,7 +66,7 @@ az containerapp env create `
   --location eastus
 
 # 7. Deploy Container App
-$DB_URL = "postgresql://dbadmin:ChainReach2025!@chainreach-db.postgres.database.azure.com:5432/chainreach_prod?sslmode=require"
+$DB_URL = "postgresql://dbadmin:<YOUR_DB_PASSWORD>@chainreach-db.postgres.database.azure.com:5432/chainreach_prod?sslmode=require"
 
 az containerapp create `
   --name segmentation-agent `
