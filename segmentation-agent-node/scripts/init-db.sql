@@ -1,6 +1,7 @@
 -- ChainReach AI - Customer Segmentation Database Schema
 
--- Drop tables if they exist (for clean setup)
+-- Drop objects if they exist (for clean setup)
+DROP VIEW IF EXISTS segment_analytics CASCADE;
 DROP TABLE IF EXISTS customers CASCADE;
 DROP TABLE IF EXISTS segments CASCADE;
 
@@ -112,10 +113,6 @@ FROM segments s
 LEFT JOIN customers c ON c.segment_id = s.id
 GROUP BY s.id, s.name, s.description;
 
--- Success message
-DO $$
-BEGIN
-    RAISE NOTICE '✅ Database schema created successfully!';
-    RAISE NOTICE '✅ Created % default segments', (SELECT COUNT(*) FROM segments);
-    RAISE NOTICE '📊 Ready to import customer data';
-END $$;
+-- Schema initialization complete
+-- Default segments have been created
+-- Ready to import customer data

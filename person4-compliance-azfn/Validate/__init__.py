@@ -46,16 +46,29 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
 
     results = []
-    for i, text in enumerate(messages):
-        analysis = analyze_message(text)
-        results.append({
-            "message_id": i,
-            "text": text,
-            "approved": analysis["approved"],
-            "reason": analysis["reason"],
-            "confidence": analysis["confidence"],
-            "categories": analysis["categories"]
-        })
+    try:
+        for i, text in enumerate(messages):
+            logger.info(f"Validating message {i}: {text[:50]}...")
+            analysis = analyze_message(text)
+            results.append({
+                "message_id": i,
+                "text": text,
+                "approved": analysis["approved"],
+                "reason": analysis["reason"],
+                "confidence": analysis["confidence"],
+                "categories": analysis["categories"]
+            })
+    except Exception as e:
+        logger.error(f"Validation error: {str(e)}", exc_info=True)
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Validation failed",
+                "details": str(e),
+                "message": "Check Azure Content Safety credentials or service status"
+            }),
+            mimetype="application/json",
+            status_code=500
+        )
 
     response = {
         "success": True,

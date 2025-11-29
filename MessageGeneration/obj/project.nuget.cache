@@ -1,11 +1,22 @@
 {
   "version": 2,
-  "dgSpecHash": "37U/Vn5oE6o=",
+  "dgSpecHash": "x4AkAFC3iCk=",
   "success": true,
   "projectFilePath": "/Users/olawalealabi/Desktop/Hackathon/MessageGeneration/MessageGeneration/MessageGeneration.csproj",
   "expectedPackageFiles": [
+    "/Users/olawalealabi/.nuget/packages/azure.ai.openai/2.1.0/azure.ai.openai.2.1.0.nupkg.sha512",
+    "/Users/olawalealabi/.nuget/packages/azure.core/1.44.1/azure.core.1.44.1.nupkg.sha512",
     "/Users/olawalealabi/.nuget/packages/microsoft.aspnetcore.openapi/10.0.0/microsoft.aspnetcore.openapi.10.0.0.nupkg.sha512",
-    "/Users/olawalealabi/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512"
+    "/Users/olawalealabi/.nuget/packages/microsoft.bcl.asyncinterfaces/6.0.0/microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
+    "/Users/olawalealabi/.nuget/packages/microsoft.extensions.apidescription.server/10.0.0/microsoft.extensions.apidescription.server.10.0.0.nupkg.sha512",
+    "/Users/olawalealabi/.nuget/packages/microsoft.openapi/2.3.0/microsoft.openapi.2.3.0.nupkg.sha512",
+    "/Users/olawalealabi/.nuget/packages/openai/2.1.0/openai.2.1.0.nupkg.sha512",
+    "/Users/olawalealabi/.nuget/packages/swashbuckle.aspnetcore/10.0.1/swashbuckle.aspnetcore.10.0.1.nupkg.sha512",
+    "/Users/olawalealabi/.nuget/packages/swashbuckle.aspnetcore.swagger/10.0.1/swashbuckle.aspnetcore.swagger.10.0.1.nupkg.sha512",
+    "/Users/olawalealabi/.nuget/packages/swashbuckle.aspnetcore.swaggergen/10.0.1/swashbuckle.aspnetcore.swaggergen.10.0.1.nupkg.sha512",
+    "/Users/olawalealabi/.nuget/packages/swashbuckle.aspnetcore.swaggerui/10.0.1/swashbuckle.aspnetcore.swaggerui.10.0.1.nupkg.sha512",
+    "/Users/olawalealabi/.nuget/packages/system.clientmodel/1.2.1/system.clientmodel.1.2.1.nupkg.sha512",
+    "/Users/olawalealabi/.nuget/packages/system.memory.data/6.0.0/system.memory.data.6.0.0.nupkg.sha512"
   ],
   "logs": []
 }
