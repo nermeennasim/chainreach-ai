@@ -100,61 +100,66 @@ class CustomerController {
   }
 
   /**
+   * Internal method to create a customer and return the result
+   * Used by both createCustomer API endpoint and bulkGenerateCustomers
+   */
+  private async _createCustomerInternal(customerData: CustomerInput): Promise<Customer> {
+    if (!customerData.name || !customerData.email) {
+      throw new Error('Name and email are required');
+    }
+
+    // Generate customer_id if not provided
+    const customerId = customerData.customer_id || `CUST-${Date.now()}`;
+
+    const result = await db.query<Customer>(
+      `INSERT INTO customers (
+        customer_id, name, email, phone, company, industry,
+        revenue, employee_count, location, country,
+        total_purchases, purchase_count, email_opens, email_clicks, website_visits,
+        custom_attributes
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+      RETURNING *`,
+      [
+        customerId,
+        customerData.name,
+        customerData.email,
+        customerData.phone || null,
+        customerData.company || null,
+        customerData.industry || null,
+        customerData.revenue || 0,
+        customerData.employee_count || 0,
+        customerData.location || null,
+        customerData.country || null,
+        customerData.total_purchases || 0,
+        customerData.purchase_count || 0,
+        customerData.email_opens || 0,
+        customerData.email_clicks || 0,
+        customerData.website_visits || 0,
+        customerData.custom_attributes ? JSON.stringify(customerData.custom_attributes) : null,
+      ]
+    );
+
+    // Calculate engagement score
+    const customer = result.rows[0];
+    const engagementScore = segmentService.calculateEngagementScore(customer);
+
+    await db.query(
+      'UPDATE customers SET engagement_score = $1 WHERE id = $2',
+      [engagementScore, customer.id]
+    );
+
+    customer.engagement_score = engagementScore;
+
+    return customer;
+  }
+
+  /**
    * POST /api/customers - Create new customer
    */
   async createCustomer(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const customerData: CustomerInput = req.body;
-
-      if (!customerData.name || !customerData.email) {
-        res.status(400).json({
-          success: false,
-          error: 'Name and email are required',
-        });
-        return;
-      }
-
-      // Generate customer_id if not provided
-      const customerId = customerData.customer_id || `CUST-${Date.now()}`;
-
-      const result = await db.query<Customer>(
-        `INSERT INTO customers (
-          customer_id, name, email, phone, company, industry,
-          revenue, employee_count, location, country,
-          total_purchases, purchase_count, email_opens, email_clicks, website_visits,
-          custom_attributes
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-        RETURNING *`,
-        [
-          customerId,
-          customerData.name,
-          customerData.email,
-          customerData.phone || null,
-          customerData.company || null,
-          customerData.industry || null,
-          customerData.revenue || 0,
-          customerData.employee_count || 0,
-          customerData.location || null,
-          customerData.country || null,
-          customerData.total_purchases || 0,
-          customerData.purchase_count || 0,
-          customerData.email_opens || 0,
-          customerData.email_clicks || 0,
-          customerData.website_visits || 0,
-          customerData.custom_attributes ? JSON.stringify(customerData.custom_attributes) : null,
-        ]
-      );
-
-      // Calculate engagement score
-      const customer = result.rows[0];
-      const engagementScore = segmentService.calculateEngagementScore(customer);
-
-      await db.query(
-        'UPDATE customers SET engagement_score = $1 WHERE id = $2',
-        [engagementScore, customer.id]
-      );
-
-      customer.engagement_score = engagementScore;
+      const customer = await this._createCustomerInternal(customerData);
 
       res.status(201).json({
         success: true,
@@ -165,6 +170,13 @@ class CustomerController {
         res.status(409).json({
           success: false,
           error: 'Customer with this email already exists',
+        });
+        return;
+      }
+      if ((error as Error).message === 'Name and email are required') {
+        res.status(400).json({
+          success: false,
+          error: (error as Error).message,
         });
         return;
       }
@@ -335,29 +347,17 @@ class CustomerController {
       for (let i = 0; i < count; i += batchSize) {
         const batchPromises = [];
         for (let j = 0; j < batchSize && (i + j) < count; j++) {
-          const customer = generateCustomer(i + j);
-          const promise = this.createCustomer(
-            { body: customer } as Request,
-            {
-              json: (data: any) => {
-                if (data.success) {
-                  createdCustomers.push(data.data);
-                } else {
-                  errors.push({ customer_id: customer.customer_id, error: data.error });
-                }
-              },
-              status: (code: number) => ({
-                json: (data: any) => {
-                  if (code >= 400) {
-                    errors.push({ customer_id: customer.customer_id, error: data.error });
-                  }
-                }
-              })
-            } as Response,
-            (err: any) => {
-              errors.push({ customer_id: customer.customer_id, error: err.message });
-            }
-          );
+          const customerData = generateCustomer(i + j);
+          const promise = this._createCustomerInternal(customerData)
+            .then((customer) => {
+              createdCustomers.push(customer);
+            })
+            .catch((error) => {
+              errors.push({ 
+                customer_id: customerData.customer_id, 
+                error: error.message || 'Failed to create customer' 
+              });
+            });
           batchPromises.push(promise);
         }
         await Promise.all(batchPromises);
