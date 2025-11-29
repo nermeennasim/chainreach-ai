@@ -1,12 +1,19 @@
 # Connect to ChainReach Azure PostgreSQL Database
 # Database credentials from .env file
 
-$DB_HOST = "chainreach-db.postgres.database.azure.com"
-$DB_PORT = "5432"
-$DB_NAME = "chainreach_prod"
-$DB_USER = "dbadmin"
-$DB_PASSWORD = "ChainReach2025!"
+# Load database credentials from environment variables
+$DB_HOST = $env:DB_HOST
+$DB_PORT = $env:DB_PORT
+$DB_NAME = $env:DB_NAME
+$DB_USER = $env:DB_USER
+$DB_PASSWORD = $env:DB_PASSWORD
 
+# Check for missing credentials
+if (-not $DB_HOST -or -not $DB_PORT -or -not $DB_NAME -or -not $DB_USER -or -not $DB_PASSWORD) {
+    Write-Host "❌ ERROR: One or more required database environment variables are missing." -ForegroundColor Red
+    Write-Host "Please set DB_HOST, DB_PORT, DB_NAME, DB_USER, and DB_PASSWORD in your environment." -ForegroundColor Red
+    exit 1
+}
 Write-Host "🔌 Connecting to ChainReach Database..." -ForegroundColor Cyan
 Write-Host "Host: $DB_HOST" -ForegroundColor Gray
 Write-Host "Database: $DB_NAME" -ForegroundColor Gray
