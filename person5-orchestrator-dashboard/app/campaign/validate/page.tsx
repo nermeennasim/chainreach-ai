@@ -19,6 +19,12 @@ interface ComplianceResult {
     sexual: number;
     self_harm: number;
   };
+  categories?: {
+    hate: number;
+    violence: number;
+    sexual: number;
+    self_harm: number;
+  };
   reason: string;
   triggered_by?: string; // Which category triggered the rejection
 }
@@ -151,7 +157,7 @@ export default function MessageValidatorPage() {
         }
 
         return {
-          message: result.message || result.text || messages[index] || 'Unknown message',
+          message: result.message || messages[index] || 'Unknown message',
           status,
           safety_scores: scores,
           reason,
