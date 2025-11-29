@@ -96,7 +96,7 @@ export function useOrchestrator() {
       // For demo: Return mock approved results if API fails
       console.log('Using fallback compliance results for demo');
       const mockResults = messages.map((_, index) => ({
-        status: (index % 5 === 0) ? 'REJECTED' : 'APPROVED' as 'APPROVED' | 'REJECTED',
+        status: (index % 5 === 0) ? 'REJECTED' : 'APPROVED',
         safety_scores: {
           hate: Math.random() * 0.5,
           violence: Math.random() * 0.5,
