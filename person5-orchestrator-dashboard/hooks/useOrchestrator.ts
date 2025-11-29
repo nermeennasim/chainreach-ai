@@ -104,6 +104,15 @@ export function useOrchestrator() {
 
     toast.success('Campaign started!');
 
+    // Declare variables at function scope to be accessible across all agents
+    let testCustomers: Customer[] = [];
+    let allMessages: string[] = [];
+    let variantMapping: Array<{
+      customer_id: string;
+      variant_id: string;
+      message: string;
+    }> = [];
+
     try {
       // AGENT 1: Customer Segmentation
       updateAgentStatus(1, { status: 'processing', progress: 10 });
@@ -128,7 +137,7 @@ export function useOrchestrator() {
         toast.success(`Agent 1: Loaded ${segments.length} segments with ${realCustomers.length} customers!`, { id: 'agent1' });
         
         // Use real customers for rest of pipeline
-        const activeCustomers = realCustomers.slice(0, 10); // Use first 10 for demo
+        testCustomers = realCustomers.slice(0, 10); // Use first 10 for demo
       } catch (error: any) {
         console.error('Agent 1 error:', error);
         updateAgentStatus(1, { status: 'error', progress: 0 });
@@ -143,6 +152,7 @@ export function useOrchestrator() {
             customers: customerData.slice(0, 100)
           }
         ];
+        testCustomers = customerData.slice(0, 10);
         updateAgentStatus(1, { status: 'done', progress: 100, data: segments.length });
         toast.success('Agent 1: Using sample data (API unavailable)', { id: 'agent1' });
       }
@@ -197,9 +207,6 @@ export function useOrchestrator() {
       toast.loading('Agent 3: Generating variants (MOCKED)...', { id: 'agent3' });
 
       try {
-        // Use real customers from Agent 1 or sample data
-        const testCustomers = customerData.slice(0, 10);
-
         // Call mock Agent 3 endpoint for message generation
         const response = await fetch('/api/agents/agent-3-message-generation', {
           method: 'POST',
@@ -217,8 +224,8 @@ export function useOrchestrator() {
         }
 
         const data = await response.json();
-        const allMessages = data.variants?.map((v: any) => v.message) || [];
-        const variantMapping = data.variants || [];
+        allMessages = data.variants?.map((v: any) => v.message) || [];
+        variantMapping = data.variants || [];
 
         updateAgentStatus(3, { status: 'done', progress: 100, data: allMessages.length });
         toast.success(`Agent 3 (MOCKED): Generated ${allMessages.length} variants!`, { id: 'agent3' });
@@ -228,13 +235,8 @@ export function useOrchestrator() {
         toast.error(`Agent 3 failed: ${error.message}`, { id: 'agent3' });
         
         // Fall back to sample variants
-        const testCustomers = customerData.slice(0, 10);
-        const allMessages: string[] = [];
-        const variantMapping: Array<{
-          customer_id: string;
-          variant_id: string;
-          message: string;
-        }> = [];
+        allMessages = [];
+        variantMapping = [];
 
         testCustomers.forEach((customer, idx) => {
           for (let v = 1; v <= 3; v++) {
@@ -297,7 +299,7 @@ export function useOrchestrator() {
         total_variants: allMessages.length,
         approved_count: approvedCount,
         rejected_count: rejectedCount,
-        approval_rate: (approvedCount / allMessages.length) * 100,
+        approval_rate: allMessages.length > 0 ? (approvedCount / allMessages.length) * 100 : 0,
       };
 
       setCampaignState((prev) => ({

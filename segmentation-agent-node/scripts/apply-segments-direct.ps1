@@ -6,7 +6,7 @@ Write-Host "=" * 60
 Write-Host ""
 
 # Database connection details from .env
-$env:PGPASSWORD = "ChainReach2024!"
+$env:PGPASSWORD = "<YOUR_DB_PASSWORD>"
 $dbHost = "chainreach-db.postgres.database.azure.com"
 $dbName = "chainreach_prod"
 $dbUser = "chainreach_admin"

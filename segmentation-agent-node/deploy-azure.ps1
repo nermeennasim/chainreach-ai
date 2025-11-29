@@ -1,4 +1,4 @@
-# Deploy to Azure - Automated Script
+pm i# Deploy to Azure - Automated Script
 # Prerequisites: Azure CLI installed and logged in
 
 param(
@@ -18,7 +18,7 @@ param(
     [string]$DBServer = "chainreach-db-node",
     
     [Parameter(Mandatory=$false)]
-    [string]$DBPassword = "ChainReach2025!",
+    [string]$DBPassword = "<YOUR_DB_PASSWORD>",
     
     [Parameter(Mandatory=$false)]
     [string]$AzureOpenAIEndpoint = "",
