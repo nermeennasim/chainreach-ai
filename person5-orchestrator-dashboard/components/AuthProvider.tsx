@@ -13,18 +13,26 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     // Check authentication status
     const checkAuth = () => {
       const authToken = localStorage.getItem('chainreach_auth');
+      const authTokenExpiry = localStorage.getItem('chainreach_auth_expiry');
+      const now = Date.now();
       
-      if (!authToken && pathname !== '/login') {
-        // Not authenticated and not on login page - redirect to login
+      // Check if token exists and is not expired
+      const isTokenValid = authToken && authTokenExpiry && now < Number(authTokenExpiry);
+      
+      if (!isTokenValid && pathname !== '/login') {
+        // Not authenticated or token expired and not on login page - redirect to login
+        // Optionally, clear invalid token
+        localStorage.removeItem('chainreach_auth');
+        localStorage.removeItem('chainreach_auth_expiry');
         router.push('/login');
         setIsAuthenticated(false);
-      } else if (authToken && pathname === '/login') {
+      } else if (isTokenValid && pathname === '/login') {
         // Authenticated but on login page - redirect to home
         router.push('/');
         setIsAuthenticated(true);
       } else {
         // All good
-        setIsAuthenticated(!!authToken);
+        setIsAuthenticated(!!isTokenValid);
       }
     };
 
