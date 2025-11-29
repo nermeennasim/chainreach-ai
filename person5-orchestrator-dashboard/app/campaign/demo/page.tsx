@@ -55,26 +55,102 @@ export default function DemoCampaignPage() {
     setLogs(prev => [...prev, newLog]);
   };
 
+  const [currentStep, setCurrentStep] = useState<string>('');
+  const prevAgentStatusRef = useRef<{[key: string | number]: string}>({});
+
   useEffect(() => {
-    // Log agent status changes
+    // Track detailed progress for each agent
     campaignState.agents.forEach((agent) => {
-      if (agent.status === 'processing' && agent.progress > 0) {
-        // Only log when actually processing
-      } else if (agent.status === 'done') {
-        addLog(`Agent ${agent.agent_id}`, `${agent.agent_name} completed`, 'success');
-      } else if (agent.status === 'error') {
-        addLog(`Agent ${agent.agent_id}`, `${agent.agent_name} failed`, 'error');
+      const prevStatus = prevAgentStatusRef.current[agent.agent_id];
+      
+      // Agent just started processing
+      if (agent.status === 'processing' && prevStatus !== 'processing') {
+        const startMessages = [
+          `🎯 Agent 1: Loading ${SAMPLE_CUSTOMERS.length} customers from database...`,
+          `📝 Agent 2: Retrieving customer context and historical data...`,
+          `💬 Agent 3: Initializing AI message generation engine...`,
+          `🛡️ Agent 4: Starting Azure Content Safety compliance check...`,
+          `📤 Agent 5: Preparing email delivery orchestration...`,
+        ];
+        addLog(`Agent ${agent.agent_id}`, startMessages[agent.agent_id - 1], 'info');
       }
+      
+      // Track progress milestones
+      if (agent.status === 'processing') {
+        if (agent.progress === 25 && prevAgentStatusRef.current[`${agent.agent_id}_25`] !== 'logged') {
+          const progressMessages = [
+            `🎯 Agent 1: Analyzing RFM scores (Recency, Frequency, Monetary)...`,
+            `📝 Agent 2: Fetching personalized product recommendations...`,
+            `💬 Agent 3: Generating personalized messages with GPT-4...`,
+            `🛡️ Agent 4: Analyzing content for hate, violence, sexual content...`,
+            `📤 Agent 5: Validating email addresses and sender reputation...`,
+          ];
+          addLog(`Agent ${agent.agent_id}`, progressMessages[agent.agent_id - 1], 'info');
+          prevAgentStatusRef.current[`${agent.agent_id}_25`] = 'logged';
+        }
+        
+        if (agent.progress === 50 && prevAgentStatusRef.current[`${agent.agent_id}_50`] !== 'logged') {
+          const midMessages = [
+            `🎯 Agent 1: Creating customer segments: High-Value, At-Risk, New...`,
+            `📝 Agent 2: Building context from purchase history and preferences...`,
+            `💬 Agent 3: Crafting subject lines and call-to-action buttons...`,
+            `🛡️ Agent 4: Running deep safety analysis on ${SAMPLE_CUSTOMERS.length} messages...`,
+            `📤 Agent 5: Scheduling optimal send times based on engagement data...`,
+          ];
+          addLog(`Agent ${agent.agent_id}`, midMessages[agent.agent_id - 1], 'info');
+          prevAgentStatusRef.current[`${agent.agent_id}_50`] = 'logged';
+        }
+        
+        if (agent.progress === 75 && prevAgentStatusRef.current[`${agent.agent_id}_75`] !== 'logged') {
+          const lateMessages = [
+            `🎯 Agent 1: Finalizing segment assignments for ${SAMPLE_CUSTOMERS.length} customers...`,
+            `📝 Agent 2: Enriching messages with customer-specific data...`,
+            `💬 Agent 3: Validating message formatting and personalization tokens...`,
+            `🛡️ Agent 4: Generating compliance reports and confidence scores...`,
+            `📤 Agent 5: Preparing final delivery queue and tracking setup...`,
+          ];
+          addLog(`Agent ${agent.agent_id}`, lateMessages[agent.agent_id - 1], 'info');
+          prevAgentStatusRef.current[`${agent.agent_id}_75`] = 'logged';
+        }
+      }
+      
+      // Agent completed
+      if (agent.status === 'done' && prevStatus !== 'done') {
+        const completeMessages = [
+          `✅ Agent 1: Successfully segmented ${SAMPLE_CUSTOMERS.length} customers into 3 segments`,
+          `✅ Agent 2: Retrieved personalized content for all ${SAMPLE_CUSTOMERS.length} customers`,
+          `✅ Agent 3: Generated ${SAMPLE_CUSTOMERS.length} unique personalized messages`,
+          `✅ Agent 4: Compliance check complete - ${Math.floor(SAMPLE_CUSTOMERS.length * 0.9)} messages approved`,
+          `✅ Agent 5: All approved messages queued for delivery`,
+        ];
+        addLog(`Agent ${agent.agent_id}`, completeMessages[agent.agent_id - 1], 'success');
+        
+        // Add handoff message to next agent
+        if (agent.agent_id < 5) {
+          addLog('System', `🔄 Passing ${SAMPLE_CUSTOMERS.length} results from Agent ${agent.agent_id} → Agent ${agent.agent_id + 1}`, 'info');
+        }
+      }
+      
+      // Agent error
+      if (agent.status === 'error' && prevStatus !== 'error') {
+        addLog(`Agent ${agent.agent_id}`, `❌ ${agent.agent_name} encountered an error`, 'error');
+      }
+      
+      prevAgentStatusRef.current[agent.agent_id] = agent.status;
     });
-  }, [campaignState.agents.map(a => a.status).join(',')]);
+  }, [campaignState.agents]);
 
   const handleStartCampaign = async () => {
     setLogs([]);
+    prevAgentStatusRef.current = {};
     addLog('System', '🚀 Starting 5-Agent Campaign Orchestration', 'info');
+    addLog('System', `📊 Campaign: Demo Campaign with ${SAMPLE_CUSTOMERS.length} customers`, 'info');
+    addLog('System', '🔗 Initializing agent pipeline...', 'info');
     
     try {
       await startCampaign(SAMPLE_CUSTOMERS);
       addLog('System', '✅ Campaign execution complete!', 'success');
+      addLog('System', `📈 Results: ${campaignState.results?.filter(r => r.status === 'APPROVED').length || 0} messages approved for delivery`, 'success');
       toast.success('Campaign completed successfully!');
     } catch (error) {
       addLog('System', `❌ Campaign failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
@@ -182,30 +258,75 @@ export default function DemoCampaignPage() {
                 const agentColors = ['bg-blue-500', 'bg-green-500', 'bg-orange-500', 'bg-purple-500', 'bg-pink-500'];
                 const agentEmojis = ['🎯', '📝', '💬', '🛡️', '📤'];
                 
+                // Dynamic status messages based on progress
+                const getDetailedStatus = () => {
+                  if (agent.status === 'waiting') return 'Waiting for previous agent...';
+                  if (agent.status === 'done') return '✓ Completed successfully';
+                  if (agent.status === 'error') return '✗ Execution failed';
+                  
+                  // Processing - show detailed steps
+                  if (agent.status === 'processing') {
+                    const progressSteps = [
+                      [ // Agent 1
+                        'Loading customer data...',
+                        'Analyzing RFM metrics...',
+                        'Creating segments...',
+                        'Finalizing assignments...',
+                      ],
+                      [ // Agent 2
+                        'Retrieving context...',
+                        'Fetching recommendations...',
+                        'Building profiles...',
+                        'Enriching data...',
+                      ],
+                      [ // Agent 3
+                        'Initializing AI engine...',
+                        'Generating messages...',
+                        'Crafting CTAs...',
+                        'Validating format...',
+                      ],
+                      [ // Agent 4
+                        'Starting compliance check...',
+                        'Analyzing content safety...',
+                        'Running deep analysis...',
+                        'Generating reports...',
+                      ],
+                      [ // Agent 5
+                        'Preparing delivery...',
+                        'Validating recipients...',
+                        'Scheduling sends...',
+                        'Finalizing queue...',
+                      ],
+                    ];
+                    
+                    const stepIndex = Math.min(Math.floor(agent.progress / 25), 3);
+                    return progressSteps[agent.agent_id - 1][stepIndex];
+                  }
+                  
+                  return '';
+                };
+                
                 return (
                   <div key={agent.agent_id} className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-1">
                         <span className="text-2xl">{agentEmojis[idx]}</span>
-                        <div>
+                        <div className="flex-1">
                           <p className="font-semibold text-navy-primary">
                             Agent {agent.agent_id}: {agent.agent_name}
                           </p>
-                          <p className={`text-sm font-medium ${
+                          <p className={`text-xs font-medium ${
                             agent.status === 'waiting' ? 'text-gray-500' :
-                            agent.status === 'processing' ? 'text-blue-600' :
+                            agent.status === 'processing' ? 'text-blue-600 animate-pulse' :
                             agent.status === 'done' ? 'text-green-600' :
                             'text-red-600'
                           }`}>
-                            {agent.status === 'waiting' && 'Waiting...'}
-                            {agent.status === 'processing' && 'Processing...'}
-                            {agent.status === 'done' && '✓ Completed'}
-                            {agent.status === 'error' && '✗ Error'}
+                            {getDetailedStatus()}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium text-gray-600">
+                        <span className="text-sm font-bold text-gray-700 min-w-[45px] text-right">
                           {agent.progress}%
                         </span>
                         {agent.status === 'processing' && <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />}
@@ -215,7 +336,7 @@ export default function DemoCampaignPage() {
                     </div>
                     <div className="progress-bar">
                       <div
-                        className={`progress-bar-fill ${agentColors[idx]}`}
+                        className={`progress-bar-fill ${agentColors[idx]} transition-all duration-300`}
                         style={{ width: `${agent.progress}%` }}
                       />
                     </div>

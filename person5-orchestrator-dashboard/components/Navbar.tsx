@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { LogOut, User } from 'lucide-react';
 
 /**
  * ChainReach AI - Official Navbar Component
@@ -15,11 +16,34 @@ import { useState } from 'react';
  * - Responsive mobile menu (hamburger)
  * - Logo on left (ChainReach logo)
  * - Navigation links: Home, Dashboard, Campaign
+ * - User profile and logout functionality
  */
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  useEffect(() => {
+    // Get user info from localStorage
+    const userData = localStorage.getItem('chainreach_user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('chainreach_auth');
+    localStorage.removeItem('chainreach_user');
+    router.push('/login');
+  };
+
+  // Don't show navbar on login page
+  if (pathname === '/login') {
+    return null;
+  }
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -58,7 +82,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-1">
+          <div className="hidden md:flex items-center space-x-1">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -76,6 +100,36 @@ export default function Navbar() {
                 )}
               </Link>
             ))}
+
+            {/* User Menu */}
+            {user && (
+              <div className="relative ml-4">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-white hover:text-cyan-primary hover:bg-navy-secondary transition-all duration-300"
+                >
+                  <User className="w-5 h-5" />
+                  <span>{user.name}</span>
+                </button>
+
+                {/* User Dropdown */}
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <div className="px-4 py-2 border-b border-gray-200">
+                      <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -137,6 +191,23 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
+
+            {/* User info and logout for mobile */}
+            {user && (
+              <div className="pt-4 pb-3 border-t border-navy-primary">
+                <div className="px-3 py-2">
+                  <p className="text-sm font-medium text-white">{user.name}</p>
+                  <p className="text-xs text-gray-400">{user.email}</p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full px-3 py-2 text-sm text-red-400 hover:bg-navy-primary transition-colors"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

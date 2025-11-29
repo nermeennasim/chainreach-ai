@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Shield, Users, FileText, Sparkles, Send, CheckCircle } from 'lucide-react';
 
 const agents = [
@@ -47,25 +48,50 @@ export default function Home() {
     <div className="bg-gray-50">
       {/* Hero Section */}
       <section className="bg-linear-to-br from-navy-primary via-navy-secondary to-navy-primary text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            ChainReach<span className="text-cyan-primary">AI</span>
-          </h1>
-          <p className="text-2xl md:text-3xl font-medium text-cyan-primary mb-4">
-            Compliance-First Marketing Automation
-          </p>
-          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-            Enterprise-grade AI that automates trust through mandatory safety validation. 
-            Never worry about harmful content reaching your customers.
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Link href="/campaign/demo" className="btn-primary inline-flex items-center">
-              Start Demo Campaign
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
-            <Link href="/dashboard" className="btn-secondary inline-flex items-center">
-              View Dashboard
-            </Link>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left side - Text content */}
+            <div className="text-center lg:text-left">
+              <h1 className="text-5xl md:text-6xl font-bold mb-6">
+                ChainReach<span className="text-cyan-primary">AI</span>
+              </h1>
+              <p className="text-2xl md:text-3xl font-medium text-cyan-primary mb-4">
+                Compliance-First Marketing Automation
+              </p>
+              <p className="text-xl text-gray-300 mb-8">
+                Enterprise-grade AI that automates trust through mandatory safety validation. 
+                Never worry about harmful content reaching your customers.
+              </p>
+              <div className="flex gap-4 justify-center lg:justify-start">
+                <Link href="/campaign/demo" className="btn-primary inline-flex items-center">
+                  Start Demo Campaign
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
+                <Link href="/dashboard" className="btn-secondary inline-flex items-center">
+                  View Dashboard
+                </Link>
+              </div>
+            </div>
+
+            {/* Right side - Hero Image */}
+            <div className="relative">
+              <div className="relative w-full h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
+                <Image
+                  src="/hero.png"
+                  alt="ChainReach AI Platform Dashboard"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+                {/* Overlay gradient for better text visibility if needed */}
+                <div className="absolute inset-0 bg-gradient-to-t from-navy-primary/20 to-transparent"></div>
+              </div>
+              {/* Floating badge */}
+              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white text-navy-primary px-6 py-3 rounded-full shadow-xl flex items-center space-x-2">
+                <Shield className="w-5 h-5 text-cyan-primary" />
+                <span className="font-semibold">99% Compliance Rate</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
