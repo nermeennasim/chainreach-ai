@@ -27,7 +27,7 @@ Write-Host ""
 
 # 3. Configure environment variables
 Write-Host "Configuring environment variables..." -ForegroundColor Yellow
-$DB_URL = "postgresql://dbadmin:ChainReach2025!@chainreach-db.postgres.database.azure.com:5432/chainreach_prod?sslmode=require"
+$DB_URL = "postgresql://dbadmin:<YOUR_DB_PASSWORD>@chainreach-db.postgres.database.azure.com:5432/chainreach_prod?sslmode=require"
 
 az webapp config appsettings set `
     --resource-group chainreach-ai `

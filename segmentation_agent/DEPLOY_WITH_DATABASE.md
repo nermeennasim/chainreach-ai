@@ -46,7 +46,7 @@ az postgres flexible-server create `
   --name chainreach-db `
   --location eastus `
   --admin-user dbadmin `
-  --admin-password "ChainReach2025!" `
+  --admin-password "<YOUR_DB_ADMIN_PASSWORD>" `
   --sku-name Standard_B1ms `
   --tier Burstable `
   --storage-size 32 `
@@ -69,7 +69,7 @@ az postgres flexible-server show `
 
 **📝 Connection String:**
 ```
-postgresql://dbadmin:ChainReach2025!@chainreach-db.postgres.database.azure.com:5432/chainreach_prod?sslmode=require
+postgresql://dbadmin:<YOUR_DB_PASSWORD>@chainreach-db.postgres.database.azure.com:5432/chainreach_prod?sslmode=require
 ```
 
 ⏱️ **Time:** 5-10 minutes | **Cost:** ~$7/month
@@ -179,7 +179,7 @@ az containerapp env create `
 
 ```powershell
 # Get your database connection string
-$DB_URL = "postgresql://dbadmin:ChainReach2025!@chainreach-db.postgres.database.azure.com:5432/chainreach_prod?sslmode=require"
+$DB_URL = "postgresql://dbadmin:<YOUR_DB_PASSWORD>@chainreach-db.postgres.database.azure.com:5432/chainreach_prod?sslmode=require"
 
 # Deploy the app with environment variables
 az containerapp create `

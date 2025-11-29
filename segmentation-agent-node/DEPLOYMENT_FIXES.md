@@ -1,3 +1,5 @@
+
+
 # ChainReach Segmentation Agent - Deployment Fixes
 
 **Status**: ✅ **LOCAL SERVER RUNNING** - Port 3000
@@ -143,10 +145,10 @@ az webapp config appsettings set `
     DB_PORT=5432 `
     DB_NAME=chainreach_prod `
     DB_USER=dbadmin `
-    DB_PASSWORD=ChainReach2025! `
+    DB_PASSWORD=<YOUR_DB_PASSWORD> `
     DB_SSL=true `
-    AZURE_OPENAI_ENDPOINT=https://nerme-mih8otmt-eastus2.cognitiveservices.azure.com/ `
-    AZURE_OPENAI_KEY=5dyOUniBaQYZHA5Ttgv4ycPlOTm2AFdnXq4at9IA7pK9fx7SXOQUJQQJ99BKACHYHv6XJ3w3AAAAACOGfUQ6 `
+    AZURE_OPENAI_ENDPOINT=<YOUR_AZURE_OPENAI_ENDPOINT> `
+    AZURE_OPENAI_KEY=<YOUR_AZURE_OPENAI_KEY> `
     AZURE_OPENAI_DEPLOYMENT=gpt-4o `
     AZURE_OPENAI_API_VERSION=2024-04-01-preview `
     ALLOWED_ORIGINS=https://chainreach-segmentation-node.azurewebsites.net,https://your-dashboard.azurewebsites.net
